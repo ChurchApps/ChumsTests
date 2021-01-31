@@ -1,0 +1,18 @@
+{
+    "name": "chums-cypress",
+    "version": "0.1.0",
+    "private": false,
+    "scripts": {
+        "start": "cd .. && cd ChumsApp && npm start",
+        "cy:run": "node_modules/.bin/cypress run --spec \"cypress/integration/01People.js\" --record --key c08234a0-1251-49a5-ab69-a85f8cda73e0",
+        "test": "start-server-and-test start http://localhost:3000 cy:run",
+        "cypress:open": "cypress open"
+    },
+    "dependencies": {
+        "cypress-wait-until": "^1.7.1"
+    },
+    "devDependencies": {
+        "cypress": "^6.0.0",
+        "start-server-and-test": "^1.11.6"
+    }
+}
