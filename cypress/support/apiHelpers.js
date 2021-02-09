@@ -3,16 +3,23 @@ const api_domain = Cypress.env("CHUMS_API_URL");
 Cypress.Commands.add("login", () => {
   cy.request({
     method: "POST",
-    url: `${Cypress.env("ACCESSMANAGEMENT_API_URL")}/users/login`,
+    url: `${Cypress.env("ACCESS_API")}/users/login`,
     body: {
       appName: Cypress.env("appName"),
       email: Cypress.env("email"),
       password: Cypress.env("password"),
     },
   })
-    .its("body.token")
+    .its("body.churches")
     .should("exist")
-    .then(($token) => cy.setCookie("jwt", $token));
+    .then((churches) => {
+      const apis = churches[0].apis;
+      apis.map((api) => {
+        if (api.keyName === "AccessApi") {
+          cy.setCookie("jwt", api.jwt);
+        }
+      });
+    });
 });
 
 Cypress.Commands.add("createPeople", (people) => {
@@ -43,7 +50,9 @@ Cypress.Commands.add("getToken", () => {
   return getCookie("jwt");
 });
 
-Cypress.Commands.add("makeApiCall", (method, route, payload) => {
+Cypress.Commands.add("makeApiCall", (method, route, apiName, payload) => {
+  const api_domain = getDomain(apiName);
+
   cy.request({
     method,
     url: api_domain + route,
@@ -52,7 +61,9 @@ Cypress.Commands.add("makeApiCall", (method, route, payload) => {
   }).its("body");
 });
 
-Cypress.Commands.add("makeAsyncApiCall", (method, route, payload) => {
+Cypress.Commands.add("makeAsyncApiCall", (method, route, apiName, payload) => {
+  const api_domain = getDomain(apiName);
+  
   const requestOptions = {
     method: method,
     headers: {
@@ -89,4 +100,15 @@ function getCookie(cname) {
     }
   }
   return "";
+}
+
+export function getDomain(apiName) {
+  const apis = [
+    { name: "AccessApi", domain: Cypress.env("ACCESS_API") },
+    { name: "AttendanceApi", domain: Cypress.env("ATTENDANCE_API") },
+    { name: "GivingApi", domain: Cypress.env("GIVING_API") },
+    { name: "MembershipApi", domain: Cypress.env("MEMBERSHIP_API") }
+  ];
+
+  return apis.filter(a => a.name === apiName)[0].domain;
 }
