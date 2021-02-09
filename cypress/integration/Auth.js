@@ -1,5 +1,3 @@
-const api_domain = Cypress.env("CHUMS_API_URL");
-
 context("Authentication", () => {
     signIn();
     signOut();
@@ -9,7 +7,7 @@ context("Authentication", () => {
 
 function signIn() {
     it("Sign in", () => {
-        cy.visit("/people");
+        cy.visit("/login");
         cy.get("[data-cy=sign-in-call-to-action]").should('exist');
         cy.enterText("[data-cy=email]", Cypress.env("email"));
         cy.enterText("[data-cy=password]", Cypress.env("password"));

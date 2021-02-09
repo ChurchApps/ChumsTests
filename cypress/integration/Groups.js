@@ -23,8 +23,8 @@ function cleanupGroups() {
   cy.clearServiceTimes();
 
   // remove groups
-  cy.makeApiCall("GET", "/groups").then(groups => {
-    groups.map(group => { cy.makeAsyncApiCall("DELETE", `/groups/${group.id}`) });
+  cy.makeApiCall("GET", "/groups", "MembershipApi").then(groups => {
+    groups.map(group => { cy.makeAsyncApiCall("DELETE", `/groups/${group.id}`, "MembershipApi") });
   });
 }
 
@@ -169,7 +169,7 @@ function createTestData(people, group, service) {
     });
   });
 
-  cy.makeApiCall("POST", "/campuses", [{ id: 0, name: service.campusName }]).then((res) => {
+  cy.makeApiCall("POST", "/campuses", "AttendanceApi", [{ id: 0, name: service.campusName }]).then((res) => {
     const campusId = res[0].id;
 
     cy.makeApiCall("POST", "/services", [{ id: 0, campusId, name: service.name }]).then((services) => {

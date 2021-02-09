@@ -1,6 +1,6 @@
 {
   "chromeWebSecurity": false,
-  "baseUrl": "http://localhost:3000",
+  "baseUrl": "http://localhost:3101",
   "env": {
     "email": "pranav@cypress.org",
     "password": "password"
