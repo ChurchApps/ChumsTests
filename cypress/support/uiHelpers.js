@@ -19,6 +19,7 @@ Cypress.Commands.add("containsAll", (selector, values) => {
 });
 
 Cypress.Commands.add("enterText", (selector, text) => {
+  cy.wait(250);
   cy.get(selector).should("exist").should("not.be.disabled").clear();
   cy.get(selector).type(text);
 });
