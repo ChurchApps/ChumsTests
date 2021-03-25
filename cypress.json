@@ -3,7 +3,8 @@
   "baseUrl": "http://localhost:3101",
   "env": {
     "email": "cypress.test@chums.org",
-    "password": "password"
+    "password": "password",
+    "appName": "CHUMS"
   },
   "projectId": "16cb4g",
   "defaultCommandTimeout": 15000
