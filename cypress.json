@@ -2,7 +2,7 @@
   "chromeWebSecurity": false,
   "baseUrl": "http://localhost:3101",
   "env": {
-    "email": "pranav@cypress.org",
+    "email": "cypress.test@chums.org",
     "password": "password"
   },
   "projectId": "16cb4g",
