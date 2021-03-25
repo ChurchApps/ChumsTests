@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": false,
     "scripts": {
+        "start": "cd .. && cd ChumsApp && npm start",
         "cypress:open": "cypress open"
     },
     "dependencies": {},
