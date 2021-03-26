@@ -84,6 +84,15 @@ Cypress.Commands.add("makeAsyncApiCall", (method, route, apiName, payload) => {
   });
 });
 
+
+Cypress.Commands.add("getQuestionsForForm", (formName) => {
+  cy.makeApiCall("GET", `/forms`, "MembershipApi").then(forms => {
+    const formId = forms.filter(f => f.name === formName)[0]?.id;
+
+    cy.makeApiCall("GET", `/questions?formId=${formId}`, "MembershipApi");
+  })
+})
+
 Cypress.on("uncaught:exception", (err, runnable) => {
   console.warn(err);
   return false;

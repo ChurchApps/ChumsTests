@@ -143,10 +143,12 @@ function reorderQuestions() {
         createFormWithQuestions(forms, questions);
         cy.visit("/forms");
         cy.containsClick(forms.name);
-        cy.get("tbody tr:first").should('contain', questions[1].title);
-        cy.get("tbody tr:first .fa-arrow-down").should('exist').click();
-        cy.get("tbody tr:last").should("contain", questions[1].title);
-        cy.get("tbody tr:last .fa-arrow-up").should('exist').click();
+        cy.getQuestionsForForm("Reorder").then(qs => {
+            cy.get("tbody tr:first").should('contain', qs[0].title);
+            cy.get("tbody tr:first .fa-arrow-down").should('exist').click();
+            cy.get("tbody tr:last").should("contain", qs[0].title);
+            cy.get("tbody tr:last .fa-arrow-up").should('exist').click();
+        })    
     })
 }
 
