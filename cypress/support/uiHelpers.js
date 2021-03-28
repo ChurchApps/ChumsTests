@@ -45,3 +45,7 @@ Cypress.Commands.add("verifyRoute", (route) => {
 Cypress.Commands.add("selectOption", (selector, value) => {
   cy.get(selector).should('exist').select(value);   
 })
+
+Cypress.Commands.add("existThenClick", (selector) => {
+  cy.get(selector).should('exist').click();
+})
