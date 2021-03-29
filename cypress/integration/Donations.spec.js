@@ -15,13 +15,12 @@ context('Donations', () => {
     donationFromPerson();
     checkFundInfo();
     verifyChart();
+    errorCaseMakeDonation();
 
 });
 
 function cleanUpDonations() {
-    cy.makeApiCall("GET", "/funds", "GivingApi").then(funds => {
-        funds.forEach(fund => cy.makeApiCall("DELETE", `/funds/${fund.id}`, "GivingApi"));
-    })
+    clearFunds();
 
     cy.makeApiCall("GET", "/donationbatches", "GivingApi").then(batches => {
         batches.forEach(batch => cy.makeApiCall("DELETE", `/donationbatches/${batch.id}`, "GivingApi"));
@@ -54,6 +53,7 @@ function addEditFundsList() {
         // delete
         cy.existThenClick("[data-cy=edit-0]");
         cy.existThenClick("[data-cy=delete-button]");
+        cy.visit("/donations");
         cy.notContainAll("[data-cy=funds-box]", [newFundName]);
     })
 }
@@ -81,6 +81,7 @@ function addEditBatchList() {
         cy.existThenClick("[data-cy=edit-0]");
         cy.wait(2000);
         cy.existThenClick("[data-cy=delete-button]");
+        cy.visit("/donations");
         cy.notContainAll("[data-cy=batches-box]", [newBatch.name, batch.name]);        
     })
 }
@@ -197,6 +198,22 @@ function verifyChart() {
     })
 }
 
+function errorCaseMakeDonation() {
+    it("Verify Error case while making donation", () => {
+        const batches = [{ name: "Error Batch", batchDate: new Date() }];
+
+        clearFunds();
+        createBatches(batches).then(res => {
+            cy.visit("/donations")
+            cy.containsClick(res[0].id);
+        });
+        cy.wait(1000);
+
+        cy.get("[data-cy=error-message]").should('exist');
+        cy.get("[data-cy=make-donation]").should('not.exist');
+    })
+}
+
 function createFunds(funds) {
     return cy.makeApiCall("POST", "/funds", "GivingApi", funds)
 }
@@ -224,4 +241,10 @@ function createTestData({ funds, batches, amount1, amount2, people, date1, date2
         })
     });
     
+}
+
+function clearFunds() {
+    cy.makeApiCall("GET", "/funds", "GivingApi").then(funds => {
+        funds.forEach(fund => cy.makeApiCall("DELETE", `/funds/${fund.id}`, "GivingApi"));
+    })
 }
