@@ -84,8 +84,8 @@ function editPerson() {
   const first = "Thomas", last = "Shelby";
   const texts = {
     email: "thomas@chums.org",
-    homePhone: "9876543210",
-    mobilePhone: "0123456789",
+    homePhone: "987-654-3210",
+    mobilePhone: "012-345-6789",
     address1: "123 N",
     address2: "North Main",
     city: "Malibu",
