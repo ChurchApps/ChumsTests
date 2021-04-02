@@ -156,11 +156,15 @@ function checkFundInfo() {
         const amount1 = 100, amount2 = 50;
         const date1 = "2021-03-25", date2 = "2021-03-28";
         const people = [{ first: "John", last: "Doe" }];
+        const filter = { start: "2021-03-23", end: "2021-03-30" }
         
         createTestData({ funds, batches, amount1, amount2, people, date1, date2 });
         cy.visit("/donations");
 
         cy.containsClick(funds[0].name);
+        cy.enterText("[data-cy=start-date]", filter.start);
+        cy.enterText("[data-cy=end-date]", filter.end);
+        cy.existThenClick("[data-cy=save-button]");
         cy.containsAll("[data-cy=content]", ["Anonymous", people[0].first, amount1, amount2]);
         cy.containsClick(people[0].first);
         
