@@ -176,6 +176,9 @@ function checkFundInfo() {
         // check batch link
         cy.makeApiCall("GET", "/donationbatches", "GivingApi").then(db => {
             
+            cy.enterText("[data-cy=start-date]", filter.start);
+            cy.enterText("[data-cy=end-date]", filter.end);
+            cy.existThenClick("[data-cy=save-button]");
             const batchId = db.filter(d => d.name === batches[0].name)[0].id;
             cy.existThenClick(`[data-cy=batchId-${batchId}-0]`);
             cy.containsAll("[data-cy=batch-heading]", [batchId]);
