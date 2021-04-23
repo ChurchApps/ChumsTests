@@ -132,6 +132,7 @@ function addPersonToSession() {
 
     // add service to the group
     const fullServiceName = `${service.campusName} - ${service.name} - ${service.time}`;
+    cy.selectOption("[data-cy=choose-service-time]", fullServiceName);
     cy.containsAll("[data-cy=choose-service-time]", [fullServiceName])
     cy.get("[data-cy=add-service-time]").should("exist").click();
     cy.get("[data-cy=save-button]").click();
