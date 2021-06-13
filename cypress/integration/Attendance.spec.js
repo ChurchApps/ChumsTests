@@ -132,7 +132,6 @@ function verifyGroupsAttendance() {
         'select-campusId': campusServiceTime[index].campus_name,
         'select-serviceId': campusServiceTime[index].service_name,
         'select-serviceTimeId': campusServiceTime[index].service_time,
-        'select-categoryName': groups[index].categoryName,
         'select-groupId': groups[index].name
       }
 
@@ -146,9 +145,9 @@ function verifyGroupsAttendance() {
       cy.get("[data-cy=save-button]").should("exist").click();
 
       const campusValues = Object.values(campusServiceTime[index]);
-      const groupValues = Object.values(groups[index])
+      const groupValues = groups[index].name
 
-      cy.containsAll("[data-cy=filter-box]", [...campusValues, ...groupValues])
+      cy.containsAll("[data-cy=filter-box]", [...campusValues, groupValues])
     });
   });
 }
