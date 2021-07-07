@@ -11,7 +11,7 @@ context("People", () => {
 
   createPerson();
   searchPerson();
-  addANote();
+  addEditNote();
   removePerson();
   editPerson();
   changeHouseholdName();
@@ -50,18 +50,34 @@ function searchPerson() {
   })
 }
 
-function addANote() {
+function addEditNote() {
   const first = "Benny";
   const last = "Beltik";
-  const noteText = 'This is a test note'
+  const noteText = "This is a test note"
+  const newNoteText = "Well, this is my edited text"
   it("Add a Note to person", () => {
     cy.createPeople([{ first, last }]);
     cy.visit('/people');
     cy.containsClick(`${first} ${last}`);
+
+    // create
+    cy.existThenClick("[data-cy=add-note-button]");
     cy.enterText("[data-cy=enter-note]", noteText);
-    cy.get("[data-cy=save-button]").should('exist').click();
-    cy.get("[data-cy=enter-note]").should('exist').should("have.value", "");
-    cy.containsAll("[data-cy=notes-box]", [ noteText ]);
+    cy.existThenClick("[data-cy=save-button]");
+    cy.containsAll("[data-cy=notes-box]", [noteText]);
+
+    // edit
+    cy.existThenClick("[data-cy=edit-note]")
+    cy.containsAll("[data-cy=enter-note]", [noteText]);
+    cy.enterText("[data-cy=enter-note]", newNoteText);
+    cy.existThenClick("[data-cy=save-button]");
+    cy.containsAll("[data-cy=notes-box]", [newNoteText]);
+    cy.notContainAll("[data-cy=notes-box]", [noteText]);
+
+    // delete
+    cy.existThenClick("[data-cy=edit-note]");
+    cy.existThenClick("[data-cy=delete-button]");
+    cy.notContainAll("[data-cy=notes-box]", [newNoteText, noteText]);
   });
 }
 
