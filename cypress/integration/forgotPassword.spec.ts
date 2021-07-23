@@ -3,6 +3,8 @@
  * testing it for chums, verifies it'll work for the rest.
  */
 
+// todo: query using name - password field
+
 import * as faker from "faker"
 
 describe("Forgot password", () => {
@@ -21,7 +23,7 @@ function shouldSendEmail() {
     cy.findByText(/reset password/i).should("exist")
     cy.findByRole("textbox").type(Cypress.env("email"))
     cy.findByRole("button", { name: /reset/i }).click()
-    cy.findByText(/email sent/i).should("exist")
+    cy.findByRole("alert").should("have.text", "Password reset email sent")
   })
 }
 
@@ -31,7 +33,7 @@ function shouldThrowError() {
 
     cy.findByRole("textbox").type(email)
     cy.findByRole("button", { name: /reset/i }).click()
-    cy.findByText(/could not find/i, { exact: false}).should("exist")
+    cy.findByRole("alert").should("have.text", "We could not find an account with this email address")
   })
 }
 
