@@ -11,7 +11,7 @@ context("Create person donation", () => {
     cy.login();
     cy.visit("people/");
     cy.loadPerson('Cypress Tester');
-    cy.existThenClick("[data-cy=donations-tab]")
+    cy.existThenClick("[aria-label=donations-tab]")
   })
   
   createPaymentMethods();
@@ -26,27 +26,27 @@ function createPaymentMethods() {
   it("Create Stripe payment methods", () => {
   
     // Card
-    cy.existThenClick("[data-cy=add-button]");
-    cy.existThenClick("[data-cy=add-card]");
+    cy.existThenClick("[aria-label=add-button]");
+    cy.existThenClick("[aria-label=add-card]");
     cy.wait(1000);
     cy.getIframe('.StripeElement > .__PrivateStripeElement > iframe').click().type("4242 4242 4242 4242 1230 123 12345");
-    cy.existThenClick("[data-cy=save-button]");
-    cy.containsAll("[data-cy=payment-methods-box]", ["visa ****4242"]);
+    cy.existThenClick("[aria-label=save-button]");
+    cy.containsAll("[aria-label=payment-methods-box]", ["visa ****4242"]);
   
     // Bank
-    cy.existThenClick("[data-cy=add-button]");
-    cy.existThenClick("[data-cy=add-bank]");
-    cy.enterText("[data-cy=account-holder-name]", "Tester Cypress");
-    cy.enterText("[data-cy=routing-number]", "110000000");
-    cy.enterText("[data-cy=account-number]", "000123456789");
-    cy.existThenClick("[data-cy=save-button]");
+    cy.existThenClick("[aria-label=add-button]");
+    cy.existThenClick("[aria-label=add-bank]");
+    cy.enterText("[aria-label=account-holder-name]", "Tester Cypress");
+    cy.enterText("[aria-label=routing-number]", "110000000");
+    cy.enterText("[aria-label=account-number]", "000123456789");
+    cy.existThenClick("[aria-label=save-button]");
   
     //Verify Bank Account
-    cy.existThenClick("[data-cy=verify-account]");
-    cy.enterText("[data-cy=amount1]", "32");
-    cy.enterText("[data-cy=amount2]", "45");
-    cy.existThenClick("[data-cy=save-button]");
-    cy.notContainAll("[data-cy=payment-methods-box]", ["Verify Account"]);
+    cy.existThenClick("[aria-label=verify-account]");
+    cy.enterText("[aria-label=amount1]", "32");
+    cy.enterText("[aria-label=amount2]", "45");
+    cy.existThenClick("[aria-label=save-button]");
+    cy.notContainAll("[aria-label=payment-methods-box]", ["Verify Account"]);
   })
 }
   
@@ -54,16 +54,16 @@ function editPaymentMethods() {
   it("Edit payment methods", () => {
   
     // Edit card
-    cy.get("[data-cy=payment-methods-box] [data-cy=edit-button]").eq(0).click();
-    cy.enterText("[data-cy=card-exp-month]", "02");
-    cy.enterText("[data-cy=card-exp-year]", "32");
-    cy.existThenClick("[data-cy=save-button]");
+    cy.get("[aria-label=payment-methods-box] [aria-label=edit-button]").eq(0).click();
+    cy.enterText("[aria-label=card-exp-month]", "02");
+    cy.enterText("[aria-label=card-exp-year]", "32");
+    cy.existThenClick("[aria-label=save-button]");
   
     // Edit bank
-    cy.get("[data-cy=payment-methods-box] [data-cy=edit-button]").eq(1).click();
-    cy.enterText("[data-cy=account-holder-name]", "Cypress Tester");
-    cy.selectOption("[data-cy=account-holder-type]", "company");
-    cy.existThenClick("[data-cy=save-button]");
+    cy.get("[aria-label=payment-methods-box] [aria-label=edit-button]").eq(1).click();
+    cy.enterText("[aria-label=account-holder-name]", "Cypress Tester");
+    cy.selectOption("[aria-label=account-holder-type]", "company");
+    cy.existThenClick("[aria-label=save-button]");
   });
 }
   
@@ -71,46 +71,46 @@ function donateFromPaymentMethods() {
   it("Make donations with Stripe", () => {
   
     // Single donation
-    cy.existThenClick("[data-cy=single-donation]");
-    cy.get('[data-cy=fund] option').eq(1).invoke('val').then(val => {
-      cy.get("[data-cy=fund]").select(val);
+    cy.existThenClick("[aria-label=single-donation]");
+    cy.get('[aria-label=fund] option').eq(1).invoke('val').then(val => {
+      cy.get("[aria-label=fund]").select(val);
     });
-    cy.enterText("[data-cy=amount]", "100");
-    cy.existThenClick("[data-cy=add-fund-donation]");
-    cy.get("[data-cy=amount]").eq(1).type("50");
-    cy.enterText("[data-cy=note]", "Test single donation note.");
-    cy.existThenClick("[data-cy=save-button]");
-    cy.existThenClick("[data-cy=donate-button]");
+    cy.enterText("[aria-label=amount]", "100");
+    cy.existThenClick("[aria-label=add-fund-donation]");
+    cy.get("[aria-label=amount]").eq(1).type("50");
+    cy.enterText("[aria-label=note]", "Test single donation note.");
+    cy.existThenClick("[aria-label=save-button]");
+    cy.existThenClick("[aria-label=donate-button]");
   
     // Recurring donation
     cy.wait(3000);
-    cy.existThenClick("[data-cy=recurring-donation]");
-    cy.get('[data-cy=method] option').eq(1).invoke('val').then(val => {
-      cy.get("[data-cy=method]").select(val);
+    cy.existThenClick("[aria-label=recurring-donation]");
+    cy.get('[aria-label=method] option').eq(1).invoke('val').then(val => {
+      cy.get("[aria-label=method]").select(val);
     });
-    cy.enterText("[data-cy=date]", "2030-01-01");
-    cy.get("[data-cy=interval-type]").select("week");
-    cy.get('[data-cy=fund] option').eq(1).invoke('val').then(val => {
-      cy.get("[data-cy=fund]").select(val);
+    cy.enterText("[aria-label=date]", "2030-01-01");
+    cy.get("[aria-label=interval-type]").select("week");
+    cy.get('[aria-label=fund] option').eq(1).invoke('val').then(val => {
+      cy.get("[aria-label=fund]").select(val);
     });
-    cy.enterText("[data-cy=amount]", "25");
-    cy.existThenClick("[data-cy=add-fund-donation]");
-    cy.get("[data-cy=amount]").eq(1).type("75");
-    cy.enterText("[data-cy=note]", "Test recurring donation note.");
-    cy.existThenClick("[data-cy=save-button]");
-    cy.existThenClick("[data-cy=donate-button]");
+    cy.enterText("[aria-label=amount]", "25");
+    cy.existThenClick("[aria-label=add-fund-donation]");
+    cy.get("[aria-label=amount]").eq(1).type("75");
+    cy.enterText("[aria-label=note]", "Test recurring donation note.");
+    cy.existThenClick("[aria-label=save-button]");
+    cy.existThenClick("[aria-label=donate-button]");
   
     // Edit recurring donation
-    cy.existThenClick("[data-cy=recurring-donations] [data-cy=edit-button]");
-    cy.get("[data-cy=method] option").eq(0).invoke('val').then(val => {
-      cy.get("[data-cy=method]").select(val);
+    cy.existThenClick("[aria-label=recurring-donations] [aria-label=edit-button]");
+    cy.get("[aria-label=method] option").eq(0).invoke('val').then(val => {
+      cy.get("[aria-label=method]").select(val);
     });
-    cy.get("[data-cy=interval-type]").select("month");
-    cy.existThenClick("[data-cy=save-button]");
+    cy.get("[aria-label=interval-type]").select("month");
+    cy.existThenClick("[aria-label=save-button]");
   
     // Delete recurring donation
-    cy.existThenClick("[data-cy=recurring-donations] [data-cy=edit-button]");
-    cy.existThenClick("[data-cy=delete-button]");
+    cy.existThenClick("[aria-label=recurring-donations] [aria-label=edit-button]");
+    cy.existThenClick("[aria-label=delete-button]");
   });
 }
   
@@ -118,12 +118,12 @@ function deletePaymentMethods() {
   it("Delete payment methods", () => {
 
     // Delete card
-    cy.get("[data-cy=payment-methods-box] [data-cy=edit-button]").eq(0).click();
-    cy.existThenClick("[data-cy=delete-button]");
+    cy.get("[aria-label=payment-methods-box] [aria-label=edit-button]").eq(0).click();
+    cy.existThenClick("[aria-label=delete-button]");
   
     // Delete bank account
-    cy.get("[data-cy=payment-methods-box] [data-cy=edit-button]").eq(0).click();
-    cy.existThenClick("[data-cy=delete-button]");
+    cy.get("[aria-label=payment-methods-box] [aria-label=edit-button]").eq(0).click();
+    cy.existThenClick("[aria-label=delete-button]");
   
   });
 }
@@ -140,8 +140,8 @@ function eventLog() {
       }
     });
     cy.visit("donations/");
-    cy.get("[data-cy=eventLogs] [data-cy=content] [data-cy=card]").eq(0).click();
-    cy.get("[data-cy=eventLogs] [data-cy=content] [data-cy=card] [data-cy=resolve-button]").eq(0).click();
+    cy.get("[aria-label=eventLogs] [aria-label=card]").eq(0).click();
+    cy.get("[aria-label=eventLogs] [aria-label=card] [aria-label=resolve-button]").eq(0).click();
   });
 }
   
