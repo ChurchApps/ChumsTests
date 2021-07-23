@@ -1,25 +1,29 @@
+/// <reference path="../support/index.d.ts" />
+
+import * as faker from "faker"
+
 context("People", () => {
   before(() => {
     cy.login();
     doCleanUp();
   })
 
-  beforeEach(() => {
-    cy.login();
-    cy.visit("/people");
-  });
+  // beforeEach(() => {
+  //   cy.login();
+  //   cy.visit("/people");
+  // });
 
-  createPerson();
-  searchPerson();
-  addEditNote();
-  removePerson();
-  editPerson();
-  changeHouseholdName();
-  noAddressChange()
-  withAddressChange();
-  mergePerson();
-  changeAddressOfAllHousehold();
-  changeAddressOfOnlyCurrentPerson();
+  // createPerson();
+  // searchPerson();
+  // addEditNote();
+  // removePerson();
+  // editPerson();
+  // changeHouseholdName();
+  // noAddressChange()
+  // withAddressChange();
+  // mergePerson();
+  // changeAddressOfAllHousehold();
+  // changeAddressOfOnlyCurrentPerson();
 });
 
 function doCleanUp() {

@@ -1,3 +1,5 @@
+/// <reference path="../support/index.d.ts" />
+
 Cypress.Commands.add("clearPeople", () => {
   cy.makeApiCall("GET", "/people/search?term=", "MembershipApi").then((people) => {
     people.map(p => {
