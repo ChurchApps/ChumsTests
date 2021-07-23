@@ -4,6 +4,7 @@ import * as faker from "faker"
 
 describe("Login / Logout", () => {
     login()
+    logout()
 })
 
 function login() {
@@ -57,5 +58,16 @@ function login() {
         cy.login()
         cy.reload()
         cy.url().should('include', "settings")
+    })
+}
+
+function logout() {
+    it("should logout the user", () => {
+        cy.login()
+        cy.visit("/people")
+        cy.findByRole("link", { name: /toggle navigation/i }).click()
+        cy.findByRole("link", { name: /logout/i }).click()
+        cy.url().should('include', "login")
+        cy.getCookie("jwt").should("not.exist")
     })
 }
