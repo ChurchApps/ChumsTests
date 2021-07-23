@@ -1,10 +1,9 @@
 /// <reference types="cypress" />
-// todo: bring appbase for all the interfaces
-
-type ApiListType = "AccessApi" | "MembershipApi" | "AttendanceApi" | "GivingApi" | "MessagingApi" | "StreamingLiveApi" | "B1Api" | "LessonsApi";
 
 declare namespace Cypress {
-    interface Chainable {
+  type ApiListType = import("../../appBase/interfaces").ApiListType
+
+  interface Chainable {
       /**
        * login programatically via api calls.
        * @example cy.login()
@@ -28,5 +27,41 @@ declare namespace Cypress {
        * @example cy.makeAsyncApiCall(method, route, apiName, payload)
        */
       makeAsyncApiCall(method: string, route: string, api: ApiListType, payload?: any): Chainable
+
+      /**
+       * remove all person records.
+       * @example cy.clearPeople()
+       */
+       clearPeople(): Chainable
+
+      /**
+       * remove all campus records.
+       * @example cy.clearCampuses()
+       */
+       clearCampuses(): Chainable
+
+      /**
+       * remove all service records.
+       * @example cy.clearServices()
+       */
+       clearServices(): Chainable
+
+      /**
+       * remove all service time records.
+       * @example cy.clearServiceTimes()
+       */
+       clearServiceTimes(): Chainable
+
+      /**
+       * remove all form records.
+       * @example cy.clearForms()
+       */
+       clearForms(): Chainable
+
+      /**
+       * remove all question records.
+       * @example cy.clearQuestions()
+       */
+       clearQuestions(): Chainable
     }
 }
