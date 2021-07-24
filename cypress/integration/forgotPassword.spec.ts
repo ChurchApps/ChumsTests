@@ -26,6 +26,12 @@ function shouldSendEmail() {
 }
 
 function shouldThrowError() {
+
+  it("should throw a validation error for submitting without an email", () => {
+    cy.findByRole("button", { name: /reset/i }).click()
+    cy.findByText("Please enter your email address.").should("exist")
+  })
+
   it("should throw error for non-registered user", () => {
     const email = faker.internet.email();
 
