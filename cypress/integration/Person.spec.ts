@@ -14,7 +14,7 @@ context("People", () => {
   });
 
   createPerson();
-  // searchPerson();
+  searchPerson();
   // addEditNote();
   // removePerson();
   // editPerson();
@@ -31,8 +31,8 @@ function doCleanUp() {
 }
 
 function createPerson() {
-  const firstName = faker.name.firstName();
-  const lastName = faker.name.lastName(); 
+  const firstName = faker.name.firstName()
+  const lastName = faker.name.lastName()
 
   it("should throw error cause of empty fields", () => {
     cy.findByRole("button", { name: /add/i }).click()
@@ -49,14 +49,21 @@ function createPerson() {
 }
 
 function searchPerson() {
-  const first = "Mike";
-  const last = "Ross";
-  it("Search Person", () => {
-    cy.createPeople([{ first, last }]);
-    cy.enterText("[data-cy=search-input]", first);
-    cy.get("[data-cy=search-button]").should('exist').click();
-    cy.containsClick(`${first} ${last}`);
-    cy.containsAll("h2", [ `${first} ${last}` ]);
+  const first = faker.name.firstName()
+  const last = faker.name.lastName()
+
+  it("searching people should work", () => {
+    cy.createPeople([{ first, last }])
+    cy.visit("/people")
+    cy.findByRole("textbox", { name: /searchbox/i }).type(`${first} ${last}`)
+    cy.findByRole("button", { name: /search/i }).click()
+    cy.findByRole("link", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
+  })
+
+  it("should show a message when searched person is not found", () => {
+    cy.findByRole("textbox", { name: /searchbox/i }).type(`${faker.name.firstName()} ${faker.name.lastName()}`)
+    cy.findByRole("button", { name: /search/i }).click()
+    cy.findByText(/no results found\. please search for a different name or add a new person/i)
   })
 }
 

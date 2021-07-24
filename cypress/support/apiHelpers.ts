@@ -1,3 +1,5 @@
+import { NameInterface, ChurchInterface, HouseholdInterface } from "../../appBase/interfaces"
+
 Cypress.Commands.add("login", () => {
   cy.request({
     method: "POST",
@@ -10,10 +12,10 @@ Cypress.Commands.add("login", () => {
   })
     .its("body.churches")
     .should("exist")
-    .then((churches) => {
+    .then((churches: ChurchInterface[]) => {
       const apis = churches[0].apis;
-      apis.map((api) => {
-        cy.setCookie(api.keyName, api.jwt)
+      apis?.map((api) => {
+        cy.setCookie(api.keyName || "", api.jwt)
         if (api.keyName === "AccessApi") {
           cy.setCookie("jwt", api.jwt);
         }
@@ -21,10 +23,10 @@ Cypress.Commands.add("login", () => {
     });
 });
 
-Cypress.Commands.add("createPeople", (people) => {
+Cypress.Commands.add("createPeople", (people: NameInterface[]) => {
   const housePayload = people.map((p) => ({ name: p.last }));
 
-  cy.makeApiCall("POST", "/households", "MembershipApi", housePayload).then((houseHolds) => {
+  cy.makeApiCall("POST", "/households", "MembershipApi", housePayload).then((houseHolds: HouseholdInterface[]) => {
     let peoplePayload = houseHolds.map((h) => {
       const person = people.filter((p) => p.last === h.name);
       return {
