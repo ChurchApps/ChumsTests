@@ -17,7 +17,8 @@ function login() {
     it("should throw error for empty fields", () => {
         cy.visit("/login")
         cy.findByRole("button", { name: /sign in/i }).click()
-        cy.findByRole("alert").should("have.text", "Please enter your email address.Please enter your password.")
+        cy.findByText("Please enter your email address.")
+        cy.findByText("Please enter your password.")
     })
 
     it("login should fail with error for non-registered users", () => {
