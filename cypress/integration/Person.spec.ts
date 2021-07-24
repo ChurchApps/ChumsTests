@@ -36,17 +36,16 @@ function createPerson() {
 
   it("should throw error cause of empty fields", () => {
     cy.findByRole("button", { name: /add/i }).click()
+    cy.findByText(/Please enter a first name./i).should("exist")
+    cy.findByText(/Please enter a last name./i).should("exist")
   })
 
-  // it("should successfully create a person", () => {
-  // })
-
-  // it("Create Person", () => {
-  //   cy.enterText("[data-cy=firstname]", firstName);
-  //   cy.enterText("[data-cy=lastname]", lastName);
-  //   cy.get("[data-cy=add-person]").should('exist').click();
-  //   cy.containsAll("h2", [ `${firstName} ${lastName}` ]);
-  // });
+  it("should successfully create a person", () => {
+    cy.findByRole("textbox", { name: /firstname/i }).type(firstName)
+    cy.findByRole("textbox", { name: /lastname/i }).type(lastName)
+    cy.findByRole("button", { name: /add/i }).click()
+    cy.findByRole("heading", { name: new RegExp(`${firstName} ${lastName}`, "i") }).should("exist")
+  })
 }
 
 function searchPerson() {
