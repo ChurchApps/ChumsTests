@@ -8,12 +8,12 @@ context("People", () => {
     doCleanUp();
   })
 
-  // beforeEach(() => {
-  //   cy.login();
-  //   cy.visit("/people");
-  // });
+  beforeEach(() => {
+    cy.login();
+    cy.visit("/people");
+  });
 
-  // createPerson();
+  createPerson();
   // searchPerson();
   // addEditNote();
   // removePerson();
@@ -31,15 +31,22 @@ function doCleanUp() {
 }
 
 function createPerson() {
-  const firstName = "Harvey";
-  const lastName = "Specter"; 
+  const firstName = faker.name.firstName();
+  const lastName = faker.name.lastName(); 
 
-  it("Create Person", () => {
-    cy.enterText("[data-cy=firstname]", firstName);
-    cy.enterText("[data-cy=lastname]", lastName);
-    cy.get("[data-cy=add-person]").should('exist').click();
-    cy.containsAll("h2", [ `${firstName} ${lastName}` ]);
-  });
+  it("should throw error cause of empty fields", () => {
+    cy.findByRole("button", { name: /add/i }).click()
+  })
+
+  // it("should successfully create a person", () => {
+  // })
+
+  // it("Create Person", () => {
+  //   cy.enterText("[data-cy=firstname]", firstName);
+  //   cy.enterText("[data-cy=lastname]", lastName);
+  //   cy.get("[data-cy=add-person]").should('exist').click();
+  //   cy.containsAll("h2", [ `${firstName} ${lastName}` ]);
+  // });
 }
 
 function searchPerson() {
