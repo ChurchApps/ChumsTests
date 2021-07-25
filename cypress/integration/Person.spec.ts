@@ -1,6 +1,7 @@
 /// <reference path="../support/index.d.ts" />
 
 import * as faker from "faker"
+import { PersonInterface } from "../../appBase/interfaces"
 
 context("People", () => {
   before(() => {
@@ -15,7 +16,7 @@ context("People", () => {
 
   createPerson();
   searchPerson();
-  // addEditNote();
+  addEditNote();
   // removePerson();
   // editPerson();
   // changeHouseholdName();
@@ -68,33 +69,34 @@ function searchPerson() {
 }
 
 function addEditNote() {
-  const first = "Benny";
-  const last = "Beltik";
-  const noteText = "This is a test note"
-  const newNoteText = "Well, this is my edited text"
-  it("Add a Note to person", () => {
-    cy.createPeople([{ first, last }]);
-    cy.visit('/people');
-    cy.containsClick(`${first} ${last}`);
+  const first = faker.name.firstName()
+  const last = faker.name.lastName()
+  const noteText = faker.lorem.sentence()
+  const newNoteText = faker.lorem.sentence()
 
-    // create
-    cy.existThenClick("[data-cy=add-note-button]");
-    cy.enterText("[data-cy=enter-note]", noteText);
-    cy.existThenClick("[data-cy=save-button]");
-    cy.containsAll("[data-cy=notes-box]", [noteText]);
+  it("should add/edit/delete a note", () => {
+    cy.createPeople([{ first, last }]).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`)
+    })
+
+    // add
+    cy.findByRole("button", { name: /addnote/i }).click()
+    cy.findByRole("textbox", { name: /add a note/i }).type(noteText)
+    cy.findByRole("button", { name: /save/i }).click()
+    cy.findByText(new RegExp(noteText, "i"))
 
     // edit
-    cy.existThenClick("[data-cy=edit-note]")
-    cy.containsAll("[data-cy=enter-note]", [noteText]);
-    cy.enterText("[data-cy=enter-note]", newNoteText);
-    cy.existThenClick("[data-cy=save-button]");
-    cy.containsAll("[data-cy=notes-box]", [newNoteText]);
-    cy.notContainAll("[data-cy=notes-box]", [noteText]);
+    cy.findByRole("button", { name: /editnote/i }).click()
+    cy.findByRole("textbox", { name: /edit note/i }).should("have.value", noteText)
+    cy.findByRole("textbox", { name: /edit note/i }).clear().type(newNoteText)
+    cy.findByRole("button", { name: /save/i }).click()
+    cy.findByText(new RegExp(newNoteText, "i"))
 
     // delete
-    cy.existThenClick("[data-cy=edit-note]");
-    cy.existThenClick("[data-cy=delete-button]");
-    cy.notContainAll("[data-cy=notes-box]", [newNoteText, noteText]);
+    cy.findByRole("button", { name: /editnote/i }).click()
+    cy.findByRole("button", { name: /delete/i }).click()
+    cy.findByText(new RegExp(newNoteText, "i")).should("not.exist")
+    cy.findByText(/create a note and they'll start appearing here\./i)
   });
 }
 
