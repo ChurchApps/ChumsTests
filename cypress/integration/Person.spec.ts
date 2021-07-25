@@ -14,9 +14,9 @@ describe("People", () => {
     cy.visit("/people");
   });
 
-  createPerson();
-  searchPerson();
-  // removePerson();
+  create();
+  search();
+  cancelAndRemove();
   // editPerson();
   // changeHouseholdName();
   // noAddressChange()
@@ -30,7 +30,7 @@ function doCleanUp() {
   cy.clearPeople();
 }
 
-function createPerson() {
+function create() {
   const firstName = faker.name.firstName()
   const lastName = faker.name.lastName()
 
@@ -48,13 +48,12 @@ function createPerson() {
   })
 }
 
-function searchPerson() {
+function search() {
   const first = faker.name.firstName()
   const last = faker.name.lastName()
 
   it("searching people should work", () => {
     cy.createPeople([{ first, last }])
-    cy.visit("/people")
     cy.findByRole("textbox", { name: /searchbox/i }).type(`${first} ${last}`)
     cy.findByRole("button", { name: /search/i }).click()
     cy.findByRole("link", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
@@ -67,18 +66,26 @@ function searchPerson() {
   })
 }
 
-function removePerson() {
-  const first = "Bruce";
-  const last = "wayne";
+function cancelAndRemove() {
+  const first = faker.name.firstName()
+  const last = faker.name.lastName()
 
-  it("Remove person", () => {
-    cy.createPeople([{ first, last }]);
-    cy.visit('/people');
-    cy.containsClick(`${first} ${last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${first} ${last}` ]);
-    cy.get("[data-cy=edit-person-button]").should('exist').click();
-    cy.get("[data-cy=delete-button]").should('exist').click();
-    cy.verifyRoute("/people");
+  it("should cancel edit person mode", () => {
+    cy.createPeople([{ first, last }]).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`)
+    });
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("button", { name: /cancel/i }).click()
+    cy.findByRole("heading", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
+  })
+
+  it("should remove a person record", () => {
+    cy.createPeople([{ first: faker.name.firstName(), last: faker.name.lastName() }]).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`)
+    });
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("button", { name: /delete/i }).click()
+    cy.findByRole("heading", { name: /people/i }).should("exist")
   })
 }
 
