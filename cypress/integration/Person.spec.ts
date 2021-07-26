@@ -17,7 +17,11 @@ describe("People", () => {
   create();
   search();
   cancelAndRemove();
-  // editPerson();
+  edit();
+
+  // todo - add a test to verify image change
+  // updateImage()
+
   // changeHouseholdName();
   // noAddressChange()
   // withAddressChange();
@@ -89,47 +93,69 @@ function cancelAndRemove() {
   })
 }
 
-function editPerson() {
-  const first = "Thomas", last = "Shelby";
-  const texts = {
-    email: "thomas@chums.org",
-    homePhone: "987-654-3210",
-    mobilePhone: "012-345-6789",
-    address1: "123 N",
-    address2: "North Main",
-    city: "Malibu",
-    zip: "543216"
+function edit() {
+  const first = faker.name.firstName()
+  const last = faker.name.lastName()
+
+  const textbox = {
+    email: faker.internet.email(),
+    "middle name": faker.name.middleName(),
+    nickname: faker.name.firstName(),
+    "line 1": faker.address.streetPrefix(),
+    "line 2": faker.address.streetName(),
+    city: faker.address.city(),
+    zip: faker.address.zipCode(),
+    home: faker.phone.phoneNumber("###-###-####"),
+    work: faker.phone.phoneNumber("###-###-####"),
+    mobile: faker.phone.phoneNumber("###-###-####")
   }
-  const options = {
-    gender: "Male",
-    "member-ship-status": "Visitor",
+
+  const dropdown = {
+    "membership status": "Member",
+    gender: "Female",
+    "marital status": "Single",
     state: "CA"
   }
 
-  it("Edit and verify Person", () => {
-    cy.createPeople([{ first, last }]);
-    cy.visit('/people');
-    cy.containsClick(`${first} ${last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${first} ${last}` ]);
-    cy.get("[data-cy=edit-person-button]").should('exist').click();
+  const dates = {
+    birthdate: "1990-01-01",
+    anniversary: "2010-10-01"
+  }
 
-    const textKeys = Object.keys(texts);
-    const optionKeys = Object.keys(options);
-    textKeys.map(key => {
-      cy.enterText(`[data-cy=${key}]`, texts[key]);
+  it("should be able to edit person record", () => {
+    cy.createPeople([{ first, last }]).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`);
     })
-    cy.enterText("[data-cy=birthdate]", "1997-01-01")
-    optionKeys.map(key => {
-      cy.selectOption(`[data-cy=${key}]`, options[key]);
-    })
-    
-    const textValues = Object.values(texts);
-    const optionValues = Object.values(options);
-    
-    cy.get(":nth-child(3) > [data-cy=save-button]").click();
-    cy.containsAll("h2", [ `${first} ${last}` ]);
-    cy.containsAll("[data-cy=person-details-box]", ["24"]);
-    cy.containsAll("[data-cy=person-details-box]", [...textValues, ...optionValues]);
+    cy.findByRole("button", { name: /editperson/i }).click()
+
+    // fill all textbox values
+    for (let key in textbox) {
+      let value = textbox[key as keyof typeof textbox]
+      cy.findByRole("textbox", { name: new RegExp(key, "i") }).type(value)
+    }
+
+    // select all dropdown
+    for (let key in dropdown) {
+      let value = dropdown[key as keyof typeof dropdown]
+      cy.findByRole("combobox", { name: new RegExp(key, "i") }).select(value)
+    }
+
+    // pick dates
+    for (let key in dates) {
+      let value = dates[key as keyof typeof dates]
+      cy.findByLabelText(new RegExp(key, "i")).type(value)
+    }
+
+    cy.findByRole("button", { name: /save/i }).click()
+
+    // verify after save
+    cy.findByText(new RegExp(`${first} "${textbox.nickname}" ${last}`))
+    cy.findByText(/female/i)
+    cy.findByText(new RegExp(textbox.email), "i")
+    cy.findByText(new RegExp(`${textbox.city}, CA ${textbox.zip}`))
+    cy.findByRole('cell', { name: textbox.home })
+    cy.findByRole('cell', { name: textbox.work })
+    cy.findByRole('cell', { name: textbox.mobile })
   });
 }
 
