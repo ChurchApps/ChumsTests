@@ -122,6 +122,25 @@ function edit() {
     anniversary: "2010-10-01"
   }
 
+  it("should throw validation errors for wrong input in fields", () => {
+    cy.createPeople([{ first: faker.name.firstName(), last: faker.name.lastName() }]).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`);
+    })
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("textbox", { name: /first name/i }).clear()
+    cy.findByRole("textbox", { name: /last name/i }).clear()
+    cy.findByRole("textbox", { name: /email/i }).type("ask")
+    cy.findByRole("textbox", { name: /home/i }).type("456")
+    cy.findByRole("textbox", { name: /work/i }).type("456")
+    cy.findByRole("textbox", { name: /mobile/i }).type("456")
+    cy.findByRole("button", { name: /save/i }).click()
+
+    cy.findAllByText(/phone number is not valid/i)
+    cy.findByText(/first name is required/i)
+    cy.findByText(/last name is required/i)
+    cy.findByText(/please enter a valid email address./i)
+  })
+
   it("should be able to edit person record", () => {
     cy.createPeople([{ first, last }]).then((people: PersonInterface[]) => {
       cy.visit(`/people/${people[0].id}`);
