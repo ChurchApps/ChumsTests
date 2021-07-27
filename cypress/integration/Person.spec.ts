@@ -11,7 +11,6 @@ describe("People", () => {
 
   beforeEach(() => {
     cy.login();
-    cy.visit("/people");
   });
 
   create();
@@ -22,11 +21,9 @@ describe("People", () => {
   // todo - add a test to verify image change
   // updateImage()
 
-  // noAddressChange()
-  // withAddressChange();
   // mergePerson();
-  // changeAddressOfAllHousehold();
-  // changeAddressOfOnlyCurrentPerson();
+  changeAddressCurrentPerson();
+  changeAddressFullHousehold();
 });
 
 function doCleanUp() {
@@ -38,6 +35,7 @@ function create() {
   const lastName = faker.name.lastName()
 
   it("should throw error cause of empty fields", () => {
+    cy.visit("/")
     cy.findByRole("button", { name: /add/i }).click()
     cy.findByText(/Please enter a first name./i).should("exist")
     cy.findByText(/Please enter a last name./i).should("exist")
@@ -56,12 +54,14 @@ function search() {
   const { name: { first, last } } = people[0]
   it("searching people should work", () => {
     cy.createPeople(people)
+    cy.visit("/")
     cy.findByRole("textbox", { name: /searchbox/i }).type(`${first} ${last}`)
     cy.findByRole("button", { name: /search/i }).click()
     cy.findByRole("link", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
   })
 
   it("should show a message when searched person is not found", () => {
+    cy.visit("/")
     cy.findByRole("textbox", { name: /searchbox/i }).type(`${faker.name.firstName()} ${faker.name.lastName()}`)
     cy.findByRole("button", { name: /search/i }).click()
     cy.findByText(/no results found\. please search for a different name or add a new person/i)
@@ -198,86 +198,6 @@ function createTestData(people, contactInfo) {
   });
 }
 
-function noAddressChange() {
-  const people = [
-    { first: "James", last: "Bond" },
-    { first: "Hayley", last: "Marshall" }
-  ]
-  const contactInfo = [
-    {
-    address1: "123 N",
-    address2: "North Main",
-    city: "Malibu",
-    state: "CA",
-    zip: "543216"
-    }, 
-    {
-      address1: "Trinity",
-      address2: "UK"
-    }
-  ]
-  it("Add member to household without address change", () => {
-    createTestData(people, contactInfo);
-    cy.visit('/people');
-    const person1 = people[0], person2 = people[1];
-
-    cy.containsClick(`${person2.first} ${person2.last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${person2.first} ${person2.last}` ]);
-    cy.get("[data-cy=edit-button]").should('exist').click();
-    cy.get("[data-cy=add-button]").should('exist').click();
-    cy.enterText("[data-cy=person-search-bar]", person1.first);
-    cy.get("[data-cy=person-search-button]").should('exist').click();
-    cy.get("[data-cy=add-to-list]").should('exist').click();
-    cy.get("[data-cy=no-button]").should('exist').click();
-    cy.get(":nth-child(2) > [data-cy=save-button]").should('exist').click();
-    cy.containsClick(`${person1.first} ${person1.last}`);
-
-    const infoOfPerson2 = Object.values(contactInfo[1]);
-    cy.notContainAll("[data-cy=person-details-box]", infoOfPerson2)
-  });
-}
-
-function withAddressChange() {
-  const people = [
-    { first: "Damon", last: "Lake" },
-    { first: "Elena", last: "Marshall" }
-  ]
-  const contactInfo = [
-    {
-    address1: "123 N",
-    address2: "North Main",
-    city: "Malibu",
-    state: "CA",
-    zip: "543216"
-    }, 
-    {
-      address1: "Trinity",
-      address2: "UK"
-    }
-  ]
-  it("Add member to household with its address changed", () => {
-    createTestData(people, contactInfo);
-    cy.visit("/people");
-    const person1 = people[0], person2 = people[1];
-
-    cy.containsClick(`${person1.first} ${person1.last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${person1.first} ${person1.last}` ]);
-    cy.get("[data-cy=edit-button]").should('exist').click();
-    cy.get("[data-cy=add-button]").should('exist').click();
-    cy.enterText("[data-cy=person-search-bar]", person2.first);
-    cy.get("[data-cy=person-search-button]").should('exist').click();
-    cy.get("[data-cy=add-to-list]").should('exist').click();
-    cy.get("[data-cy=yes-button]").should('exist').click();
-    cy.containsAll("[data-cy=household-box]", [ `${person2.first} ${person2.last}` ]);
-    cy.get(":nth-child(2) > [data-cy=save-button]").should('exist').click();
-    cy.containsClick(`${person2.first} ${person2.last}`);
-
-    const infoOfPerson1 = Object.values(contactInfo[0]);
-    cy.containsAll("[data-cy=person-details-box]", infoOfPerson1)
-  });
-}
-
-
 function mergePerson() {
   const people = [
     { first: "Richard", last: "Henricks" },
@@ -320,121 +240,50 @@ function mergePerson() {
    });
 }
 
-function createTestDataWithMembers(peopleToCreate, contactInfo) {
-  cy.createPeople(peopleToCreate).then(() => {
-    cy.makeApiCall("GET", "/people/search?term=", "MembershipApi").then(people => {
-      let members = [];
-      const [person1, person2] = peopleToCreate;
-      people.map(p => {
-        if (p.name.display === `${person1.first} ${person1.last}` || p.name.display === `${person2.first} ${person2.last}`) {
-          members.push(p);
-        }
-      })
-      const updatehouseHoldMembers = members.map((m, index) => {
-        return {
-            ...m,
-            householdId: members[0].householdId,
-            contactInfo: {
-              ...m.contactInfo,
-              ...contactInfo[index]
-            }
-        }
-      })
-      cy.makeApiCall("POST", "/people", "MembershipApi", updatehouseHoldMembers);
-      cy.makeApiCall("POST", `/people/household/${members[0].householdId}`, "MembershipApi", updatehouseHoldMembers);
+function createTestDataWithMembers(people: PersonInterface[]) {
+  cy.createPeople(people).then((people: PersonInterface[]) => {
+    const peopleIds = people.map(p => p.id).join(",")
+    cy.makeApiCall("GET", `/people/ids?ids=${peopleIds}`, "MembershipApi").then((result: PersonInterface[]) => {
+      const updatedPeople = result.map(p => ({
+        ...p,
+        householdId: result[0].householdId
+      }))
+
+      cy.makeApiCall("POST", "/people", "MembershipApi", updatedPeople);
+      cy.makeApiCall("POST", `/people/household/${people[0].householdId}`, "MembershipApi", updatedPeople);
+      cy.visit(`/people/${people[0].id}`);
     })
-
-  });
-}
-
-function changeAddressOfAllHousehold() {
-  const people = [
-    { first: "Richard", last: "Henricks" },
-    { first: "Gavin", last: "Belson" }
-  ]
-  const contactInfo = [
-    {
-    address1: "123 N",
-    address2: "North Main",
-    city: "Malibu",
-    state: "CA",
-    zip: "543216"
-    }, 
-    {
-      address1: "654 six street",
-      address2: "opposite maria beach",
-      city: "London",
-      state: "Scotland",
-      zip: "25874"
-    }
-  ]
-
-  const newAddress1 = "114 PT";
-  const newAddress2 = "Saint louis";
-
-  it("Change Address of all household members on changing address of one member", () => {
-    createTestDataWithMembers(people, contactInfo);
-    cy.visit('/people');
-    const person1 = people[0], person2 = people[1];
-
-    cy.containsClick(`${person1.first} ${person1.last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${person1.first} ${person1.last}` ]);
-    cy.get("[data-cy=edit-person-button]").should('exist').click();
-    cy.enterText("[data-cy=address1]", newAddress1);
-    cy.enterText("[data-cy=address2]", newAddress2);
-    cy.get(":nth-child(3) > [data-cy=save-button]").should('exist').click();
-    cy.get("[data-cy=yes-button]").should('exist').click();
-    cy.containsAll("h2", [`${person1.first} ${person1.last}`]);
-
-    // verify change
-    cy.containsAll("[data-cy=person-details-box]", [newAddress1, newAddress2]);
-    cy.containsClick(`${person2.first} ${person2.last}`);
-    cy.containsAll("[data-cy=person-details-box]", [newAddress1, newAddress2]);
   })
 }
 
-function changeAddressOfOnlyCurrentPerson() {
-  const people = [
-    { first: "Hank", last: "Moody" },
-    { first: "Troye", last: "sivan" }
-  ]
-  const contactInfo = [
-    {
-    address1: "123 N",
-    address2: "North Main",
-    city: "Malibu",
-    state: "CA",
-    zip: "543216"
-    }, 
-    {
-      address1: "654 six street",
-      address2: "opposite maria beach",
-      city: "London",
-      state: "Scotland",
-      zip: "25874"
-    }
-  ]
+function changeAddressCurrentPerson() {
+  const people = getPeople(2, { withoutAddress: true })
+  const address1 = faker.address.streetName()
 
-  const newAddress1 = "666 street";
-  const newAddress2 = "Besides shot cinema";
+  it("should only change address of current person", () => {
+    createTestDataWithMembers(people);
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("textbox", { name: /line 1/i }).type(address1)
+    cy.findByRole("button", { name: /save/i }).click()
+    cy.findByText(/update address/i).should("exist")
+    cy.findByRole("button", { name: /no/i }).click()
+    cy.findByRole("link", { name: new RegExp(`${people[1].name.first} ${people[1].name.last}`) }).click()
+    cy.findByText(new RegExp(address1, "i")).should("not.exist")
+  })
+}
 
-  it("Verify change in address causes change in address only for that person", () => {
-    createTestDataWithMembers(people, contactInfo);
-    cy.visit("/people");
-    const person1 = people[0], person2 = people[1];
+function changeAddressFullHousehold() {
+  const people = getPeople(2, { withoutAddress: true })
+  const address1 = faker.address.streetName()
 
-    cy.containsClick(`${person1.first} ${person1.last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${person1.first} ${person1.last}` ]);
-    cy.get("[data-cy=edit-person-button]").should('exist').click();
-    cy.enterText("[data-cy=address1]", newAddress1);
-    cy.enterText("[data-cy=address2]", newAddress2);
-    cy.get(":nth-child(3) > [data-cy=save-button]").should('exist').click();
-    cy.get("[data-cy=no-button]").should('exist').click();
-    cy.containsAll("h2", [`${person1.first} ${person1.last}`]);
-
-    // verify
-    cy.containsAll("[data-cy=person-details-box]", [newAddress1, newAddress2]);
-    cy.containsClick(`${person2.first} ${person2.last}`);
-    cy.notContainAll("[data-cy=person-details-box]", [newAddress1, newAddress2]);
+  it("should change address of all household members", () => {
+    createTestDataWithMembers(people);
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("textbox", { name: /line 1/i }).type(address1)
+    cy.findByRole("button", { name: /save/i }).click()
+    cy.findByText(/update address/i).should("exist")
+    cy.findByRole("button", { name: /yes/i }).click()
+    cy.findByRole("link", { name: new RegExp(`${people[1].name.first} ${people[1].name.last}`) }).click()
+    cy.findByText(new RegExp(address1, "i")).should("exist")
   })
 }
