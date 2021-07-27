@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
 
 declare namespace Cypress {
-  type ApiListType = import("../../appBase/interfaces").ApiListType
-  type NameInterface = import("../../appBase/interfaces").NameInterface
+  type ApiListType = import("../../appBase/interfaces/index").ApiListType
+  type PersonInterface = import("../../appBase/interfaces/index").PersonInterface
 
   interface Chainable {
       /**
@@ -67,8 +67,8 @@ declare namespace Cypress {
 
        /**
         * create person records.
-        * @example cy.createPeople([{ firstName, lastName }])
+        * @example cy.createPeople(people)
         */
-       createPeople(people: NameInterface[]): Chainable
+       createPeople(people: PersonInterface[]): Chainable
     }
 }

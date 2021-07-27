@@ -1,4 +1,5 @@
-import { NameInterface, ChurchInterface, HouseholdInterface } from "../../appBase/interfaces"
+import * as faker from "faker"
+import { NameInterface, ChurchInterface, HouseholdInterface, ContactInfoInterface, PersonInterface } from "./index"
 
 Cypress.Commands.add("login", () => {
   cy.request({
@@ -23,18 +24,18 @@ Cypress.Commands.add("login", () => {
     });
 });
 
-Cypress.Commands.add("createPeople", (people: NameInterface[]) => {
-  const housePayload = people.map((p) => ({ name: p.last }));
+Cypress.Commands.add("createPeople", (people: PersonInterface[]) => {
+  const housePayload = people.map((p) => ({ name: p.name.last }));
 
   cy.makeApiCall("POST", "/households", "MembershipApi", housePayload).then((houseHolds: HouseholdInterface[]) => {
     let peoplePayload = houseHolds.map((h) => {
-      const person = people.filter((p) => p.last === h.name);
+      const person = people.filter((p) => p.name.last === h.name);
       return {
         householdId: h.id,
-        name: person[0],
+        ...person[0]
       };
     });
-
+    console.log(peoplePayload)
     cy.makeApiCall("POST", "/people", "MembershipApi", peoplePayload);
   });
 });
@@ -125,4 +126,30 @@ export function getApiInfo(apiName) {
   }
 
   return { domain: domains[apiName], token: getCookie(apiName) }
+}
+
+type Options = {
+  withoutAddress?: boolean
+}
+
+export function getPeople(amount: number, options?: Options): PersonInterface[] {
+  let people: PersonInterface[] = []
+  while (amount > 0) {
+      people.push({
+          name: {
+              first: faker.name.firstName(),
+              last: faker.name.lastName()
+          },
+          contactInfo: options?.withoutAddress ? {} 
+              : {
+              address1: faker.address.streetPrefix(),
+              address2: faker.address.streetName(),
+              city: faker.address.city(),
+              state: "CA",
+              zip: faker.address.zipCode()
+          }
+      })
+      amount--
+  }
+  return people
 }
