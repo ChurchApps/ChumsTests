@@ -21,7 +21,7 @@ describe("People", () => {
   // todo - add a test to verify image change
   // updateImage()
 
-  // mergePerson();
+  mergePerson();
   changeAddressCurrentPerson();
   changeAddressFullHousehold();
 });
@@ -178,66 +178,31 @@ function edit() {
   });
 }
 
-function createTestData(people, contactInfo) {
-  cy.createPeople(people).then((people) => {
-    people.map((person, index) => {
-      const personId = person.id;
-     
-      cy.getPerson(personId).then(p => {
-        const newPerson = {
-          ...p,
-          contactInfo: {
-            ...p.contactInfo,
-            ...contactInfo[index]
-          }
-        }
-        cy.makeApiCall("POST", "/people", "MembershipApi", [newPerson]);
-      });      
-    })
-
-  });
-}
-
 function mergePerson() {
-  const people = [
-    { first: "Richard", last: "Henricks" },
-    { first: "Gilfoyle", last: "smith" }
-  ]
-  const contactInfo = [
-    {
-    address1: "123 N",
-    address2: "North Main",
-    city: "Malibu",
-    state: "CA",
-    zip: "543216"
-    }, 
-    {
-      address1: "654 six street",
-      address2: "opposite maria beach",
-      city: "London",
-      state: "Scotland",
-      zip: "25874"
-    }
-  ]  
+  const people = getPeople(2)
+  const person1 = people[0]
+  const person2 = people[1]
+
   it("Merge person records", () => {
-
-    createTestData(people, contactInfo)
-    cy.visit("/people");
-    const person1 = people[0], person2 = people[1];
-
-    cy.containsClick(`${person1.first} ${person1.last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${person1.first} ${person1.last}` ]);
-    cy.get("[data-cy=edit-person-button]").should('exist').click();
-    cy.get("[data-cy=merge-button]").should('exist').click();
-    cy.enterText("[data-cy=search-input]", person2.first);
-    cy.get("[data-cy=search-button]").should('exist').click();
-    cy.get(".text-success").should('exist').click();
-    cy.get("[data-cy=merge-modal]").should('exist').should('be.visible');
+    cy.createPeople(people).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`);
+    })
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("button", { name: /merge/i }).click()
+    cy.findByRole("textbox", { name: /searchperson/i }).type(people[1].name.first || "")
+    cy.findByRole("button", { name: /search/i }).click()
+    cy.findByRole("cell", { name: /merge/i }).within(() => {
+      cy.findByRole("button", { name: /merge/i }).click()
+    })
+    cy.findByText(new RegExp(`would you like to merge ${person1.name.first} ${person1.name.last} with ${person2.name.first} ${person2.name.last}?`, "i")).should("exist")
+    cy.findByRole("button", { name: /confirm/i }).click()
+    cy.findByText(/Please select atleast 1 value for each field/i)
     cy.get(".col-sm-10 > :nth-child(2) > .form-check-input").check();
-    cy.get("[data-cy=confirm-merge]").should('exist').click();
-    cy.containsAll("h1", ["People"]);
-    cy.notContainAll("[data-cy=content]", [`${person1.first} ${person1.last}`]);
-   });
+    cy.findByRole("button", { name: /confirm/i }).click()
+    cy.findByRole("textbox", { name: /searchbox/i }).type(`${person1.name.first} ${person1.name.last}`)
+    cy.findByRole("button", { name: /search/i }).click()
+    cy.findByRole("link", { name: new RegExp(`${person1.name.first} ${person1.name.last}`, "i") }).should("not.exist")
+  });
 }
 
 function createTestDataWithMembers(people: PersonInterface[]) {
