@@ -1,7 +1,7 @@
 /// <reference path="../support/index.d.ts" />
 
 import * as faker from "faker"
-import { PersonInterface } from "../../appBase/interfaces"
+import { getPeople, PersonInterface } from "../support/index"
 
 describe("People", () => {
   before(() => {
@@ -22,7 +22,6 @@ describe("People", () => {
   // todo - add a test to verify image change
   // updateImage()
 
-  // changeHouseholdName();
   // noAddressChange()
   // withAddressChange();
   // mergePerson();
@@ -53,11 +52,10 @@ function create() {
 }
 
 function search() {
-  const first = faker.name.firstName()
-  const last = faker.name.lastName()
-
+  const people = getPeople(1)
+  const { name: { first, last } } = people[0]
   it("searching people should work", () => {
-    cy.createPeople([{ first, last }])
+    cy.createPeople(people)
     cy.findByRole("textbox", { name: /searchbox/i }).type(`${first} ${last}`)
     cy.findByRole("button", { name: /search/i }).click()
     cy.findByRole("link", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
@@ -71,11 +69,11 @@ function search() {
 }
 
 function cancelAndRemove() {
-  const first = faker.name.firstName()
-  const last = faker.name.lastName()
+  const people = getPeople(1)
+  const { name: { first, last } } = people[0]
 
   it("should cancel edit person mode", () => {
-    cy.createPeople([{ first, last }]).then((people: PersonInterface[]) => {
+    cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit(`/people/${people[0].id}`)
     });
     cy.findByRole("button", { name: /editperson/i }).click()
@@ -84,7 +82,8 @@ function cancelAndRemove() {
   })
 
   it("should remove a person record", () => {
-    cy.createPeople([{ first: faker.name.firstName(), last: faker.name.lastName() }]).then((people: PersonInterface[]) => {
+    const people = getPeople(1)
+    cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit(`/people/${people[0].id}`)
     });
     cy.findByRole("button", { name: /editperson/i }).click()
@@ -94,8 +93,8 @@ function cancelAndRemove() {
 }
 
 function edit() {
-  const first = faker.name.firstName()
-  const last = faker.name.lastName()
+  const people = getPeople(1, { withoutAddress: true })
+  const { name: { first, last } } = people[0]
 
   const textbox = {
     email: faker.internet.email(),
@@ -123,7 +122,8 @@ function edit() {
   }
 
   it("should throw validation errors for wrong input in fields", () => {
-    cy.createPeople([{ first: faker.name.firstName(), last: faker.name.lastName() }]).then((people: PersonInterface[]) => {
+    const people = getPeople(1)
+    cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit(`/people/${people[0].id}`);
     })
     cy.findByRole("button", { name: /editperson/i }).click()
@@ -142,7 +142,7 @@ function edit() {
   })
 
   it("should be able to edit person record", () => {
-    cy.createPeople([{ first, last }]).then((people: PersonInterface[]) => {
+    cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit(`/people/${people[0].id}`);
     })
     cy.findByRole("button", { name: /editperson/i }).click()
@@ -176,21 +176,6 @@ function edit() {
     cy.findByRole('cell', { name: textbox.work })
     cy.findByRole('cell', { name: textbox.mobile })
   });
-}
-
-function changeHouseholdName() {
-  it("Change household name", () => {
-    const first = "Beth", last = "Hart", newHouseHoldName = "Harmon";
-
-    cy.createPeople([{ first, last}]);
-    cy.visit('/people');
-    cy.containsClick(`${first} ${last}`);
-    cy.containsAll("[data-cy=household-box]", [ `${first} ${last}` ]);
-    cy.get("[data-cy=edit-button]").should('exist').click();
-    cy.enterText("[data-cy=household-name]", newHouseHoldName);
-    cy.get(":nth-child(2) > [data-cy=save-button]").should('exist').click();
-    cy.containsAll("[data-cy=household-box] > .header", [newHouseHoldName]);
-  });  
 }
 
 function createTestData(people, contactInfo) {

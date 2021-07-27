@@ -1,5 +1,5 @@
 import * as faker from "faker"
-import { PersonInterface } from "../../appBase/interfaces"
+import { PersonInterface, getPeople } from "../support/index"
 
 describe("Notes", () => {
   before(() => {
@@ -7,13 +7,12 @@ describe("Notes", () => {
       cy.clearPeople()
   })
 
-  const first = faker.name.firstName()
-  const last = faker.name.lastName()
+  const people = getPeople(1)
   const noteText = faker.lorem.sentence()
   const newNoteText = faker.lorem.sentence()
 
   it("should add/edit/cancel/delete a note", () => {
-    cy.createPeople([{ first, last }]).then((people: PersonInterface[]) => {
+    cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit(`/people/${people[0].id}`)
     })
 
