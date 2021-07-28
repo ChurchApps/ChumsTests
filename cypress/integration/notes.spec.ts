@@ -21,7 +21,7 @@ function addEdit() {
   const noteText = faker.lorem.sentence()
   const newNoteText = faker.lorem.sentence()
 
-  it("should add/edit/cancel/delete a note", () => {
+  it("should add / edit a note", () => {
     cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit(`/people/${people[0].id}`)
     })
