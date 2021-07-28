@@ -7,6 +7,16 @@ describe("Notes", () => {
       cy.clearPeople()
   })
 
+  beforeEach(() => {
+    cy.login()
+  })
+
+  addEdit()
+  cancel()
+  deleteNote()
+})
+
+function addEdit() {
   const people = getPeople(1)
   const noteText = faker.lorem.sentence()
   const newNoteText = faker.lorem.sentence()
@@ -28,16 +38,34 @@ describe("Notes", () => {
     cy.findByRole("textbox", { name: /edit note/i }).clear().type(newNoteText)
     cy.findByRole("button", { name: /save/i }).click()
     cy.findByText(new RegExp(newNoteText, "i"))
+  });
+}
 
-    // cancel
+function cancel() {
+  const people = getPeople(1)
+  it("should cancel on note creation", () => {
+    cy.createPeople(people).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`)
+    })
+
     cy.findByRole("button", { name: /addnote/i }).click()
     cy.findByRole("button", { name: /cancel/i }).click()
     cy.findByRole("textbox", { name: /add a note/i }).should("not.exist")
+  })
+}
 
-    // delete
+function deleteNote() {
+  const text = faker.lorem.sentence()
+  
+  it("should delete a note", () => {
+    cy.login()
+    const people = getPeople(1)
+    cy.createPeople(people).then((people: PersonInterface[]) => {
+      cy.makeApiCall("POST", "/notes", "MembershipApi", [{ contentId: people[0].id, contentType: "person", contents: text }])
+      cy.visit(`/people/${people[0].id}`)
+    })
     cy.findByRole("button", { name: /editnote/i }).click()
     cy.findByRole("button", { name: /delete/i }).click()
-    cy.findByText(new RegExp(newNoteText, "i")).should("not.exist")
-    cy.findByText(/create a note and they'll start appearing here\./i)
-  });
-})
+    cy.findByText(new RegExp(text, "i")).should("not.exist")
+  })
+}
