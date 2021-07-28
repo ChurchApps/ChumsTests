@@ -102,7 +102,7 @@ function donateFromPaymentMethods() {
     cy.findByRole("button", { name: /donate-button/i }).click();
 
     // Edit recurring donation
-    cy.existThenClick("[aria-label=recurring-donations] [aria-label=edit-button]");
+    cy.existThenClick("[data-cy=recurring-donations] [aria-label=edit-button]");
     cy.get("[aria-label=method] option").eq(0).invoke('val').then(val => {
       cy.get("[aria-label=method]").select(val);
     });
@@ -110,7 +110,7 @@ function donateFromPaymentMethods() {
     cy.findByRole("button", { name: /save-button/i }).click();
   
     // Delete recurring donation
-    cy.existThenClick("[aria-label=recurring-donations] [aria-label=edit-button]");
+    cy.existThenClick("[data-cy=recurring-donations] [aria-label=edit-button]");
     cy.findByRole("button", { name: /delete-button/i }).click();
   });
 }
@@ -141,7 +141,7 @@ function eventLog() {
       }
     });
     cy.visit("donations/");
-    cy.get("[aria-label=eventLogs] [aria-label=card]").eq(0).click();
+    cy.get("[data-cy=eventLogs] [aria-label=card]").eq(0).click();
     cy.findByRole("button", { name: /resolve-button/i }).click();
   });
 }
