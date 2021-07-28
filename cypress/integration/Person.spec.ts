@@ -1,5 +1,3 @@
-/// <reference path="../support/index.d.ts" />
-
 import * as faker from "faker"
 import { getPeople, PersonInterface } from "../support/index"
 
