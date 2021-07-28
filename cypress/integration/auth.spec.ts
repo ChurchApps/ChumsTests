@@ -1,5 +1,3 @@
-/// <reference path="../../support/index.d.ts" />
-
 import * as faker from "faker"
 
 describe("Login / Logout", () => {
