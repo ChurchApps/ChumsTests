@@ -17,10 +17,7 @@ describe("People", () => {
   search();
   cancelAndRemove();
   edit();
-
-  // todo - add a test to verify image change
-  // updateImage()
-
+  image()
   mergePerson();
   changeAddressCurrentPerson();
   changeAddressFullHousehold();
@@ -176,6 +173,34 @@ function edit() {
     cy.findByRole('cell', { name: textbox.work })
     cy.findByRole('cell', { name: textbox.mobile })
   });
+}
+
+function image() {
+  const people = getPeople(1)
+  const imagePath = "images/nature.jpg"
+
+  it("should change image of person", () => {
+    cy.createPeople(people).then((people: PersonInterface[]) => {
+      cy.visit(`/people/${people[0].id}`);
+    })
+    // add new image
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("link", { name: /avatar/i }).click()
+    cy.findByText(/crop/i)
+    cy.findByRole("button", { name: /upload/i }).click()
+    cy.get('input[type="file"]').attachFile(imagePath)
+    cy.wait(3000)
+    cy.findByRole("button", { name: /update/i }).click()
+    cy.findByRole("button", { name: /save/i }).click()
+    cy.findByRole("img", { name: /personimage/i }).should("have.attr", "src").should("not.include", "sample-profile.png")
+    
+    // delete
+    cy.findByRole("button", { name: /editperson/i }).click()
+    cy.findByRole("link", { name: /avatar/i }).click()
+    cy.findByRole("button", { name: /deletephoto/i }).click()
+    cy.findByRole("button", { name: /save/i }).click()
+    cy.findByRole("img", { name: /personimage/i }).should("have.attr", "src").should("include", "sample-profile.png")
+  })
 }
 
 function mergePerson() {

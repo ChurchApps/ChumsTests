@@ -1,4 +1,5 @@
 import "@testing-library/cypress/add-commands";
+import 'cypress-file-upload';
 import "./uiHelpers";
 import "./apiHelpers";
 import "./deleteHelpers"
