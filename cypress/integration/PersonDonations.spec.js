@@ -61,6 +61,7 @@ function editPaymentMethods() {
   
     // // Edit bank
     cy.findAllByRole("link", { name: "edit-button"}).then(links => links[1].click());
+    cy.findByRole("textbox", { name: "account-holder-name" }).clear();
     cy.findByRole("textbox", { name: "account-holder-name" }).type("Cypress Tester");
     cy.selectOption("[aria-label=account-holder-type]", "company");
     cy.findByRole("button", { name: /save-button/i }).click()
