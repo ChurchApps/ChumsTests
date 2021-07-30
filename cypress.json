@@ -7,5 +7,6 @@
     "appName": "CHUMS"
   },
   "projectId": "16cb4g",
-  "defaultCommandTimeout": 15000
+  "defaultCommandTimeout": 15000,
+  "video": false
 }
