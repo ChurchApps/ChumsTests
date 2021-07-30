@@ -1,4 +1,7 @@
-context('Forms', () => {
+import * as faker from "faker"
+import { getForms, FormInterface } from "../support/index"
+
+describe('Forms', () => {
     before(() => {
         cy.login();
         cleanupForms();
@@ -6,16 +9,17 @@ context('Forms', () => {
 
     beforeEach(() => {
         cy.login();
-        cy.visit('/forms');
     })
 
-    createForm();
-    editForm();
-    deleteForm();
+    // verifyPage()
+    // deleteForm();
+    // editForm();
+    // createForm();
+    // verifyQuestionsPage()
     addQuestions();
-    editQuestion();
-    deleteQuestion();
-    reorderQuestions();
+    // editQuestion();
+    // deleteQuestion();
+    // reorderQuestions();
 });
 
 function cleanupForms() {
@@ -23,76 +27,90 @@ function cleanupForms() {
     cy.clearForms();
 }
 
-function createForm() {
-    it('Create Form', () => {
-        const formName = 'Registration'
+function verifyPage() {
+    it("should have forms heading", () => {
+        cy.visit("/forms")
+        cy.findByRole("heading", { name: /forms/i }).should("exist")
+    })
 
-        cy.get("[data-cy=add-button]").should('exist').click();
-        cy.enterText("[data-cy=form-name]", formName);
-        cy.get("[data-cy=save-button]").should('exist').click();
-        cy.containsAll("[data-cy=content]", [formName]);
+    it("should have a message when there are no forms", () => {
+        cy.visit("/forms")
+        cy.findByText(/no custom forms have been created yet\. they will appearing here when added\./i)
+    })
+}
+
+function createForm() {
+    const name = faker.lorem.word()
+
+    it('should throw validation error for creating form without name', () => {
+        cy.visit("/forms")
+        cy.findByRole("button", { name: /addform/i }).click()
+        cy.findByRole("button", { name: /save/i }).click()
+        cy.findByText(/form name is required/i).should("exist")
+    })
+
+    it("should create a form", () => {
+        cy.visit("/forms")
+        cy.findByRole("button", { name: /addform/i }).click()
+        cy.findByRole("textbox", { name: /form name/i }).type(name)
+        cy.findByRole("button", { name: /save/i }).click()
+        cy.findByRole("link", { name: new RegExp(name, "i") }).should("exist")
     })
 }
 
 function editForm() {
-    it("Edit Form", () => {
-        const forms = [{contentType: 'person', name: "Edit-Me"}];
-        const newFormName = "Edited";
+    const forms = getForms(1);
+    const newName = faker.lorem.word()
 
+    it("should edit form", () => {
         cy.createForms(forms)
         cy.visit("/forms");
-        cy.get(`[data-cy=edit-${forms[0].name}]`).should('exist').click();
-        cy.enterText("[data-cy=form-name]", newFormName);
-        cy.get("[data-cy=save-button]").should('exist').click();
-        cy.containsAll("[data-cy=content]", [newFormName]);
+        cy.findByRole("button", { name: /editform/i }).click()
+        cy.findByRole("textbox", { name: /form name/i }).clear().type(newName)
+        cy.findByRole("button", { name: /save/i }).click()
+        cy.findByRole("link", { name: new RegExp(newName, "i") }).should("exist")
     })
 }
 
 function deleteForm() {
-    it("Delete Form", () => {
-        const forms = [{contentType: "person", name: "Delete-me"}];
+    const forms = getForms(1);
+    const newName = faker.lorem.word()
 
-        cy.createForms(forms);
+    it("should delete form", () => {
+        cy.createForms(forms)
         cy.visit("/forms");
-        cy.get(`[data-cy=edit-${forms[0].name}]`).should('exist').click();
-        cy.get("[data-cy=delete-button]").should("exist").click();
-        cy.visit("/forms");
-        cy.notContainAll("[data-cy=content]", [forms[0].name]);
+        cy.findByRole("button", { name: /editform/i }).click()
+        cy.findByRole("button", { name: /delete/i }).click()
+        cy.findByRole("link", { name: new RegExp(newName, "i") }).should("not.exist")
+    })
+}
+
+function verifyQuestionsPage() {
+    it("should verify question page heading", () => {
+        const forms = getForms(1)
+        cy.createForms(forms).then((forms: FormInterface[]) => {
+            cy.visit(`/forms/${forms[0].id}`)
+        })
+        cy.findByRole("heading", { name: new RegExp(forms[0].name || "", "i") }).should("exist")
+    })
+
+    it("should have a message when there are on question", () => {
+        const forms = getForms(1)
+        cy.createForms(forms).then((forms: FormInterface[]) => {
+            cy.visit(`/forms/${forms[0].id}`)
+        })
+        cy.findByText(/no custom questions have been created yet\. questions will be listed here\./i)
     })
 }
 
 function addQuestions() {
-    it("Add all types of questions", () => {
-        const forms = [{contentType: "person", name: "Checkout"}]
-        const questions = [
-            { title: "Full Name", description: "This is some description", placeholder: "Anthony smiths" },
-            { title: "Payment Type", fieldType: "Multiple Choice", choices: ["Card", "Cash"] }
-        ]
-        const questionTitles = questions.map(q => q.title);
+    const forms = getForms(1)
 
-        cy.createForms(forms);
-        cy.visit("/forms");
-        cy.containsClick(forms[0].name);
-        // textbox question
-        cy.get("[data-cy=edit-question-button]").should('exist').click();
-        cy.enterText("[data-cy=title]", questions[0].title);
-        cy.enterText("[data-cy=description]", questions[0].description);
-        cy.enterText("[data-cy=placeholder]", questions[0].placeholder);
-        cy.get("[data-cy=save-button]").should('exist').click();
-        cy.containsAll("[data-cy=content]", [questions[0].title])
-
-        // multiple choice question
-        cy.get("[data-cy=edit-question-button]").should('exist').click();
-        cy.selectOption("[data-cy=type]", questions[1].fieldType);
-        cy.enterText("[data-cy=title]", questions[1].title);
-
-        questions[1].choices.map(choice => {
-            cy.enterText("[data-cy=value]", choice);
-            cy.enterText("[data-cy=text]", choice);
-            cy.get("[data-cy=add-button]").should('exist').click();
+    it("should add a question", () => {
+        cy.createForms(forms).then((forms: FormInterface[]) => {
+            cy.visit(`/forms/${forms[0].id}`)
         })
-        cy.get("[data-cy=save-button]").should('exist').click();
-        cy.containsAll("[data-cy=content]", questionTitles);
+        cy.findByRole("button", { name: /addquestion/i }).click()
     })
 }
 

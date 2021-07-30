@@ -1,5 +1,5 @@
 import * as faker from "faker"
-import { NameInterface, ChurchInterface, HouseholdInterface, ContactInfoInterface, PersonInterface } from "./index"
+import { ChurchInterface, HouseholdInterface, PersonInterface, FormInterface } from "./index"
 
 Cypress.Commands.add("login", () => {
   cy.request({
@@ -152,4 +152,16 @@ export function getPeople(amount: number, options?: Options): PersonInterface[] 
       amount--
   }
   return people
+}
+
+export function getForms(amount: number): FormInterface[] {
+  let forms: FormInterface[] = []
+  while(amount > 0) {
+    forms.push({
+      contentType: "person",
+      name: faker.lorem.word()
+    })
+    amount--
+  }
+  return forms
 }
