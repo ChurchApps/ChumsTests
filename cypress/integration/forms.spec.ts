@@ -1,5 +1,5 @@
 import * as faker from "faker"
-import { getForms, FormInterface } from "../support/index"
+import { getForms, FormInterface, QuestionInterface } from "../support/index"
 
 describe('Forms', () => {
     before(() => {
@@ -11,15 +11,15 @@ describe('Forms', () => {
         cy.login();
     })
 
-    // verifyPage()
-    // deleteForm();
-    // editForm();
-    // createForm();
-    // verifyQuestionsPage()
-    addQuestions();
-    // editQuestion();
-    // deleteQuestion();
-    // reorderQuestions();
+    verifyPage()
+    deleteForm();
+    editForm();
+    createForm();
+    verifyQuestionsPage()
+    addQuestion();
+    editQuestion();
+    deleteQuestion();
+    reorderQuestions();
 });
 
 function cleanupForms() {
@@ -103,80 +103,89 @@ function verifyQuestionsPage() {
     })
 }
 
-function addQuestions() {
-    const forms = getForms(1)
+function addQuestion() {
+    const title = faker.lorem.words()
 
-    it("should add a question", () => {
+    it("should throw input validation error", () => {
+        const forms = getForms(1)
+
         cy.createForms(forms).then((forms: FormInterface[]) => {
             cy.visit(`/forms/${forms[0].id}`)
         })
         cy.findByRole("button", { name: /addquestion/i }).click()
+        cy.findByRole("button", { name: /save/i }).click()
+        cy.findByText(/Title is required/i).should("exist")
+    })
+
+    it("should add a question", () => {
+        const forms = getForms(1)
+
+        cy.createForms(forms).then((forms: FormInterface[]) => {
+            cy.visit(`/forms/${forms[0].id}`)
+        })
+        cy.findByRole("button", { name: /addquestion/i }).click()
+        cy.findByRole("textbox", { name: /title/i }).type(title)
+        cy.findByRole("button", { name: /save/i }).click()
+        cy.findByRole("link", { name: new RegExp(title, "i") }).should("exist")
     })
 }
 
 function editQuestion() {
-    it("Edit question", () => {
-        const form = {contentType: "person", name: "Usual"};
-        const questions = [{ fieldType: "Textbox", title: "FirstName", description: "Enter your name", placeholder: "Johnny" }];
-        const updatedQuestion = { title: "First Name", description: "Your legal name", placeholder: "John" };
+    const forms = getForms(1)
+    const newQuestionTitle = faker.lorem.word()
 
-        createFormWithQuestions(form, questions);
-        cy.visit("/forms");
-        cy.containsClick(form.name);
-        cy.containsClick(questions[0].title);
-        cy.enterText("[data-cy=title]", updatedQuestion.title);
-        cy.enterText("[data-cy=description]", updatedQuestion.description);
-        cy.enterText("[data-cy=placeholder]", updatedQuestion.placeholder);
-        cy.get("[data-cy=save-button]").should('exist').click();
-        cy.notContainAll("[data-cy=content]", [questions[0].title]);
-        cy.containsAll("[data-cy=content]", [updatedQuestion.title]);
+    it("should edit a question", () => {
+        cy.createForms(forms).then((forms: FormInterface[]) => {
+            const questions = getQuestions(1, forms[0].id || "")
+            cy.makeApiCall("POST", "/questions", "MembershipApi", questions)
+            cy.visit(`/forms/${forms[0].id}`)
+            cy.findByRole("link", { name: new RegExp(questions[0].title || "", "i") }).click()
+        })
+        cy.findByRole("combobox", { name: /question type/i }).select("Email")
+        cy.findByRole("textbox", { name: /title/i }).clear().type(newQuestionTitle)
+        cy.findByRole("button", { name: /save/i }).click()
+        cy.findByRole("link", { name: new RegExp(newQuestionTitle, "i") }).should("exist")
+        cy.findByText(/email/i).should("exist")
     })
 }
 
 function deleteQuestion() {
-    it("Delete question", () => {
-        const form = {contentType: "person", name: "Signup"};
-        const questions = [{ fieldType: "Textbox", title: "Username", description: "A unique handle", placeholder: "gabnorth97" }];
+    const forms = getForms(1)
 
-        createFormWithQuestions(form, questions);
-        cy.visit("/forms");
-        cy.containsClick(form.name);
-        cy.containsClick(questions[0].title);
-        cy.wait(2000);
-        cy.get("[data-cy=delete-button]").should('exist').click();
-        cy.visit("/forms");
-        cy.containsClick(form.name);
-        cy.notContainAll("[data-cy=content]", [questions[0].title]);
+    it("should be able to delete a question", () => {
+        cy.createForms(forms).then((forms: FormInterface[]) => {
+            const questions = getQuestions(1, forms[0].id || "")
+            cy.makeApiCall("POST", "/questions", "MembershipApi", questions)
+            cy.visit(`/forms/${forms[0].id}`)
+            cy.findByRole("link", { name: new RegExp(questions[0].title || "", "i") }).click()
+        })
+        cy.findByRole("button", { name: /delete/i }).click()
+        cy.findByText(/no custom questions have been created yet\. questions will be listed here\./i)
     })
 }
 
 function reorderQuestions() {
+    const forms = getForms(1)
     it('Re-order questions', () => {
-        const forms = {contentType: "person", name: "Reorder"}
-        const questions = [
-            { fieldType: "Textbox", title: "FirstName" },
-            { fieldType: "Textbox", title: "LastName" }
-        ]
-
-        createFormWithQuestions(forms, questions);
-        cy.visit("/forms");
-        cy.containsClick(forms.name);
-        cy.getQuestionsForForm("Reorder").then(qs => {
-            cy.get("tbody tr:first").should('contain', qs[0].title);
-            cy.get("tbody tr:first .fa-arrow-down").should('exist').click();
-            cy.get("tbody tr:last").should("contain", qs[0].title);
-            cy.get("tbody tr:last .fa-arrow-up").should('exist').click();
-        })    
+        cy.createForms(forms).then((forms: FormInterface[]) => {
+            const questions = getQuestions(2, forms[0].id || "")
+            cy.makeApiCall("POST", "/questions", "MembershipApi", questions)
+            cy.visit(`/forms/${forms[0].id}`)
+        })
+        cy.findByRole("button", { name: /moveup/i }).click()
+        cy.findByRole("button", { name: /movedown/i }).click()
     })
 }
 
-function createFormWithQuestions(form, questions) {
-    cy.createForms([form]).then(result => {
-        const formId = result[0].id;
-
-        questions.forEach(q => {
-            q.formId = formId;
+function getQuestions(amount: number, formId: string): QuestionInterface[] {
+    const questions: QuestionInterface[] = []
+    while(amount > 0) {
+        questions.push({
+            fieldType: "Textbox",
+            formId,
+            title: faker.lorem.word(),
         })
-        cy.makeApiCall("POST", "/questions", "MembershipApi", questions);
-    })
+        amount--
+    }
+    return questions
 }
