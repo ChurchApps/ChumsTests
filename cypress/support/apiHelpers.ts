@@ -159,7 +159,7 @@ export function getForms(amount: number): FormInterface[] {
   while(amount > 0) {
     forms.push({
       contentType: "person",
-      name: faker.lorem.word()
+      name: faker.company.companyName()
     })
     amount--
   }
