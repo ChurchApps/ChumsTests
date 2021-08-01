@@ -40,7 +40,7 @@ function verifyPage() {
 }
 
 function createForm() {
-    const name = faker.lorem.word()
+    const name = faker.company.companyName()
 
     it('should throw validation error for creating form without name', () => {
         cy.visit("/forms")
@@ -60,7 +60,7 @@ function createForm() {
 
 function editForm() {
     const forms = getForms(1);
-    const newName = faker.lorem.word()
+    const newName = faker.company.companyName()
 
     it("should edit form", () => {
         cy.createForms(forms).then(() => {
@@ -77,7 +77,7 @@ function editForm() {
 
 function deleteForm() {
     const forms = getForms(1);
-    const newName = faker.lorem.word()
+    const newName = faker.company.companyName()
 
     it("should delete form", () => {
         cy.createForms(forms)
@@ -107,7 +107,7 @@ function verifyQuestionsPage() {
 }
 
 function addQuestion() {
-    const title = faker.lorem.words()
+    const title = faker.company.companyName()
 
     it("should throw input validation error", () => {
         const forms = getForms(1)
@@ -135,7 +135,7 @@ function addQuestion() {
 
 function editQuestion() {
     const forms = getForms(1)
-    const newQuestionTitle = faker.lorem.word()
+    const newQuestionTitle = faker.company.companyName()
 
     it("should edit a question", () => {
         cy.createForms(forms).then((forms: FormInterface[]) => {
@@ -186,7 +186,7 @@ function getQuestions(amount: number, formId: string): QuestionInterface[] {
         questions.push({
             fieldType: "Textbox",
             formId,
-            title: faker.lorem.word(),
+            title: faker.company.companyName(),
         })
         amount--
     }
