@@ -63,12 +63,15 @@ function editForm() {
     const newName = faker.lorem.word()
 
     it("should edit form", () => {
-        cy.createForms(forms)
-        cy.visit("/forms");
-        cy.findByRole("button", { name: /editform/i }).click()
-        cy.findByRole("textbox", { name: /form name/i }).clear().type(newName)
-        cy.findByRole("button", { name: /save/i }).click()
-        cy.findByRole("link", { name: new RegExp(newName, "i") }).should("exist")
+        cy.createForms(forms).then(() => {
+            cy.visit("/forms");
+            cy.findByRole("row", { name: new RegExp(forms[0].name || "", "i") }).within(() => {
+                cy.findByRole("button", { name: /editform/i }).click()
+            })
+            cy.findByRole("textbox", { name: /form name/i }).clear().type(newName)
+            cy.findByRole("button", { name: /save/i }).click()
+            cy.findByRole("link", { name: new RegExp(newName, "i") }).should("exist")
+        })
     })
 }
 
