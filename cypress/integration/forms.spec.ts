@@ -109,17 +109,6 @@ function verifyQuestionsPage() {
 function addQuestion() {
     const title = faker.company.companyName()
 
-    it("should throw input validation error", () => {
-        const forms = getForms(1)
-
-        cy.createForms(forms).then((forms: FormInterface[]) => {
-            cy.visit(`/forms/${forms[0].id}`)
-        })
-        cy.findByRole("button", { name: /addquestion/i }).click()
-        cy.findByRole("button", { name: /save/i }).click()
-        cy.findByText(/Title is required/i).should("exist")
-    })
-
     it("should add a question", () => {
         const forms = getForms(1)
 
@@ -163,7 +152,6 @@ function deleteQuestion() {
             cy.findByRole("link", { name: new RegExp(questions[0].title || "", "i") }).click()
         })
         cy.findByRole("button", { name: /delete/i }).click()
-        cy.findByText(/no custom questions have been created yet\. questions will be listed here\./i)
     })
 }
 
