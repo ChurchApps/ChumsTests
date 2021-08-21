@@ -108,6 +108,7 @@ function addWithAddressChange() {
         cy.findByRole("button", { name: /search/i }).click()
         cy.findByRole("button", { name: /addperson/i }).click()
         cy.findByRole("button", { name: /yes/i }).click()
+        cy.wait(2000)
         cy.findByRole("button", { name: /save/i }).click()
         cy.findByRole("link", { name: new RegExp(`${people[1].name.first} ${people[1].name.last}`) }).click()
         cy.findByText(new RegExp(`${people[0].contactInfo.city}, ${people[0].contactInfo.state} ${people[0].contactInfo.zip}`)).should("exist")
