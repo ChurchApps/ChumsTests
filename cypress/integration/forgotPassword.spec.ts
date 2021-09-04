@@ -7,7 +7,8 @@ import * as faker from "faker"
 
 describe("Forgot password", () => {
   beforeEach(() => {
-    cy.visit("/forgot")
+    cy.visit("/login")
+    cy.findByRole("link", { name: /forgot password/i }).click()
   })
 
   shouldSendEmail()
@@ -49,6 +50,6 @@ function testLinks() {
 
   it("should navigate to churchWebApps site", () => {
     cy.findByRole("link", { name: /register/i }).click()
-    cy.url().should('include', Cypress.env("CHURCH_WEB_APPS_URL"))
+    cy.findByRole("heading", { name: /create an account/i })
   })
 }

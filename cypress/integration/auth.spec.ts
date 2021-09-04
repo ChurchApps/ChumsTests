@@ -35,6 +35,8 @@ function login() {
         cy.findByRole("textbox", { name: /email/i }).type(Cypress.env("email"))
         cy.findByLabelText(/password/i).type(Cypress.env("password"))
         cy.findByRole("button", { name: /sign in/i }).click()
+        cy.findByText(/select church/i)
+        cy.findByText(/cypress church/i).click()
         cy.url().should('include', "people")
         cy.getCookie("jwt").should("exist")
     })
