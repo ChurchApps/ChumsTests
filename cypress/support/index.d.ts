@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 
 declare namespace Cypress {
-  type ApiListType = import("../../appBase/interfaces/index").ApiListType
-  type PersonInterface = import("../../appBase/interfaces/index").PersonInterface
-  type FormInterface = import("../../appBase/interfaces/index").FormInterface
+  type ApiListType = import("./index").ApiListType
+  type PersonInterface = import("./index").PersonInterface
+  type FormInterface = import("./index").FormInterface
+  type GroupInterface = import("./index").GroupInterface
 
   interface Chainable {
       /**
@@ -77,5 +78,17 @@ declare namespace Cypress {
         * @example cy.createForms(forms)
         */
        createForms(forms: FormInterface[]): Chainable
+
+       /**
+        * create group
+        * @example cy.createGroup(group)
+        */
+       createGroup(group: GroupInterface): Chainable
+
+       /**
+        * get person record
+        * @example cy.getPerson(personId)
+        */
+        getPerson(personId: string): Chainable
     }
 }

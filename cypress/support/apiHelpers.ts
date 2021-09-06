@@ -1,5 +1,5 @@
 import * as faker from "faker"
-import { ChurchInterface, HouseholdInterface, PersonInterface, FormInterface } from "./index"
+import { ChurchInterface, HouseholdInterface, PersonInterface, FormInterface, GroupInterface } from "./index"
 
 Cypress.Commands.add("login", () => {
   cy.request({
@@ -40,7 +40,7 @@ Cypress.Commands.add("createPeople", (people: PersonInterface[]) => {
   });
 });
 
-Cypress.Commands.add("createGroup", (group) => {
+Cypress.Commands.add("createGroup", (group: GroupInterface) => {
   cy.makeApiCall("POST", "/groups", "MembershipApi", [group]);
 });
 
@@ -48,7 +48,7 @@ Cypress.Commands.add("createForms", (forms) => {
   cy.makeApiCall("POST", '/forms', "MembershipApi", forms)
 })
 
-Cypress.Commands.add("getPerson", (personId) => {
+Cypress.Commands.add("getPerson", (personId: string) => {
   cy.makeApiCall("GET", `/people/${personId}`, "MembershipApi");
 });
 
