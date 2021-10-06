@@ -13,7 +13,6 @@ describe("Forgot password", () => {
 
   shouldSendEmail()
   shouldThrowError()
-  testLinks()
 })
 
 // email is only sent if user it's tested for a registered user.
@@ -27,29 +26,11 @@ function shouldSendEmail() {
 }
 
 function shouldThrowError() {
-
-  it("should throw a validation error for submitting without an email", () => {
-    cy.findByRole("button", { name: /reset/i }).click()
-    cy.findByText("Please enter your email address.").should("exist")
-  })
-
   it("should throw error for non-registered user", () => {
     const email = faker.internet.email();
 
     cy.findByRole("textbox", { name: "email" }).type(email)
     cy.findByRole("button", { name: /reset/i }).click()
     cy.findByRole("alert").should("have.text", "We could not find an account with this email address")
-  })
-}
-
-function testLinks() {
-  it("should navigate to login page", () => {
-    cy.findByRole("link", { name: /login/i }).click()
-    cy.findAllByText(/sign in/i).should("exist")
-  })
-
-  it("should navigate to churchWebApps site", () => {
-    cy.findByRole("link", { name: /register/i }).click()
-    cy.findByRole("heading", { name: /create an account/i })
   })
 }
