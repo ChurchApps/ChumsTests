@@ -24,14 +24,6 @@ function cleanupAttendance() {
 
 function campus() {
 
-  it("show give an error about empty field", () => {
-    cy.findByRole("link", { name: /addbutton/i }).click()
-    cy.findByRole("link", { name: /add campus/i }).click()
-    cy.findByRole("textbox", { name: /campus name/i }).clear()
-    cy.findByRole("button", { name: /save/i }).click()
-    cy.findByText(/campus name is required/i).should("exist")
-  })
-
   it("should add / edit / delete Campus", () => {
     const BEFORE_CAMPUS_NAME = faker.random.word()
     const AFTER_CAMPUS_NAME = faker.random.word()
@@ -58,15 +50,6 @@ function campus() {
 
 function service() {
 
-  it("should throw an error for empty field", () => {
-    cy.findByRole("link", { name: /addbutton/i }).click()
-    cy.findByRole("link", { name: /addservice/i }).click()
-    cy.findByRole("textbox", { name: /service name/i }).clear()
-    cy.findByRole("button", { name: /save/i }).click()
-    cy.findByText(/please select a campus/i).should("exist")
-    cy.findByText(/service name is required/i).should("exist")
-  })
-  
   it("should add / edit / delete a Service", () => {
     const CAMPUS_NAME = faker.random.word()
     const BEFORE_SERVICE_NAME = faker.random.word()
@@ -99,15 +82,6 @@ function service() {
 }
 
 function serviceTime() {
-
-  it("should throw error for empty fields", () => {
-    cy.findByRole("link", { name: /addbutton/i }).click()
-    cy.findByRole("link", { name: /add service time/i }).click()
-    cy.findByRole("textbox", { name: /service time name/i }).clear()
-    cy.findByRole("button", { name: /save/i }).click()
-    cy.findByText(/please select a service/i).should("exist")
-    cy.findByText(/service time is required/i).should("exist")
-  })
 
   it("should add / edit / delete Service Time", () => {
     const CAMPUS_NAME = faker.random.word()

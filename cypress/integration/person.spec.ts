@@ -29,14 +29,8 @@ function create() {
   const firstName = faker.name.firstName()
   const lastName = faker.name.lastName()
 
-  it("should throw error cause of empty fields", () => {
-    cy.visit("/")
-    cy.findByRole("button", { name: /add/i }).click()
-    cy.findByText(/Please enter a first name./i).should("exist")
-    cy.findByText(/Please enter a last name./i).should("exist")
-  })
-
   it("should successfully create a person", () => {
+    cy.visit("/")
     cy.findByRole("textbox", { name: /firstname/i }).type(firstName)
     cy.findByRole("textbox", { name: /lastname/i }).type(lastName)
     cy.findByRole("button", { name: /add/i }).click()
@@ -55,26 +49,11 @@ function search() {
     cy.findByRole("link", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
   })
 
-  it("should show a message when searched person is not found", () => {
-    cy.visit("/")
-    cy.findByRole("textbox", { name: /searchbox/i }).type(`${faker.name.firstName()} ${faker.name.lastName()}`)
-    cy.findByRole("button", { name: /search/i }).click()
-    cy.findByText(/no results found\. please search for a different name or add a new person/i)
-  })
 }
 
 function cancelAndRemove() {
   const people = getPeople(1)
   const { name: { first, last } } = people[0]
-
-  it("should cancel edit person mode", () => {
-    cy.createPeople(people).then((people: PersonInterface[]) => {
-      cy.visit(`/people/${people[0].id}`)
-    });
-    cy.findByRole("button", { name: /editperson/i }).click()
-    cy.findByRole("button", { name: /cancel/i }).click()
-    cy.findByRole("heading", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
-  })
 
   it("should remove a person record", () => {
     const people = getPeople(1)
@@ -115,26 +94,6 @@ function edit() {
     birthdate: "1990-01-01",
     anniversary: "2010-10-01"
   }
-
-  it("should throw validation errors for wrong input in fields", () => {
-    const people = getPeople(1)
-    cy.createPeople(people).then((people: PersonInterface[]) => {
-      cy.visit(`/people/${people[0].id}`);
-    })
-    cy.findByRole("button", { name: /editperson/i }).click()
-    cy.findByRole("textbox", { name: /first name/i }).clear()
-    cy.findByRole("textbox", { name: /last name/i }).clear()
-    cy.findByRole("textbox", { name: /email/i }).type("ask")
-    cy.findByRole("textbox", { name: /home/i }).type("456")
-    cy.findByRole("textbox", { name: /work/i }).type("456")
-    cy.findByRole("textbox", { name: /mobile/i }).type("456")
-    cy.findByRole("button", { name: /save/i }).click()
-
-    cy.findAllByText(/phone number is not valid/i)
-    cy.findByText(/first name is required/i)
-    cy.findByText(/last name is required/i)
-    cy.findByText(/please enter a valid email address./i)
-  })
 
   it("should be able to edit person record", () => {
     cy.createPeople(people).then((people: PersonInterface[]) => {
@@ -249,11 +208,7 @@ function changeAddressCurrentPerson() {
   const address1 = faker.address.streetName()
 
   it("should only change address of current person", () => {
-    createTestDataWithMembers(people);
-    cy.findByRole("button", { name: /editperson/i }).click()
-    cy.findByRole("textbox", { name: /line 1/i }).type(address1)
-    cy.findByRole("button", { name: /save/i }).click()
-    cy.findByText(/update address/i).should("exist")
+    createPeopleWithAddress(people, address1)
     cy.findByRole("button", { name: /no/i }).click()
     cy.findByRole("link", { name: new RegExp(`${people[1].name.first} ${people[1].name.last}`) }).click()
     cy.findByText(new RegExp(address1, "i")).should("not.exist")
@@ -265,13 +220,17 @@ function changeAddressFullHousehold() {
   const address1 = faker.address.streetName()
 
   it("should change address of all household members", () => {
-    createTestDataWithMembers(people);
-    cy.findByRole("button", { name: /editperson/i }).click()
-    cy.findByRole("textbox", { name: /line 1/i }).type(address1)
-    cy.findByRole("button", { name: /save/i }).click()
-    cy.findByText(/update address/i).should("exist")
+    createPeopleWithAddress(people, address1)
     cy.findByRole("button", { name: /yes/i }).click()
     cy.findByRole("link", { name: new RegExp(`${people[1].name.first} ${people[1].name.last}`) }).click()
     cy.findByText(new RegExp(address1, "i")).should("exist")
   })
+}
+
+function createPeopleWithAddress(people: PersonInterface[], address1: string) {
+  createTestDataWithMembers(people);
+  cy.findByRole("button", { name: /editperson/i }).click()
+  cy.findByRole("textbox", { name: /line 1/i }).type(address1)
+  cy.findByRole("button", { name: /save/i }).click()
+  cy.findByText(/update address/i).should("exist")
 }
