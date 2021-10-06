@@ -7,18 +7,6 @@ describe("Login / Logout", () => {
 
 function login() {
 
-    it("sign in heading should be present", () => {
-        cy.visit("/login")
-        cy.findAllByText(/sign in/i).should("exist")
-    })
-
-    it("should throw error for empty fields", () => {
-        cy.visit("/login")
-        cy.findByRole("button", { name: /sign in/i }).click()
-        cy.findByText("Please enter your email address.")
-        cy.findByText("Please enter your password.")
-    })
-
     it("login should fail with error for non-registered users", () => {
         cy.visit("/login")
         const email = faker.internet.email()
@@ -46,20 +34,6 @@ function login() {
         cy.url().should('include', "login")
     })
 
-    it("should be able to redirect to other routes when logged in", () => {
-        cy.login()
-        cy.visit("/groups")
-        cy.url().should('include', "groups")
-        cy.visit("/attendance")
-        cy.url().should('include', "attendance")
-    })
-
-    it("after login redirect to the original route where user was redirected for login", () => {
-        cy.visit("/settings")
-        cy.login()
-        cy.reload()
-        cy.url().should('include', "settings")
-    })
 }
 
 function logout() {
