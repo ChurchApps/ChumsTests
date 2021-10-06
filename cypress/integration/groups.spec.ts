@@ -14,7 +14,6 @@ context("Groups", () => {
 
   createGroup();
   deleteGroup();
-  trackAttendanceAndTabs();
   addRemovePersonGroup();
   addPersonToSession();
 });
@@ -32,14 +31,6 @@ function cleanupGroups() {
 }
 
 function createGroup() {
-  
-  it("should throw error for empty fields", () => {
-    cy.findByRole("button", { name: /addgroup/i }).click()
-    cy.findByRole("button", { name: /add group/i }).click()
-    cy.findByText(/category name is required/i)
-    cy.findByText(/group name is required/i)
-  })
-
   it("should create group", () => {
     const categoryName = faker.commerce.department();
     const groupName = faker.commerce.product();
@@ -62,21 +53,6 @@ function deleteGroup() {
     cy.findByRole("button", { name: /editbutton/i }).click()
     cy.findByRole("button", { name: /delete/i }).click()
     cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).should("not.exist")
-  });
-}
-
-function trackAttendanceAndTabs() {
-  it("should enable track attendance", () => {
-    const group = getGroups(1)[0]
-
-    cy.createGroup(group);
-    cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).click()
-    cy.findByRole("heading", { name: new RegExp(group.name || "", "i") }).should("exist")
-    cy.findByRole("button", { name: /editbutton/i }).click()
-    cy.findByRole("combobox", { name: /track attendance/i }).select("Yes").should("have.value", "true")
-    cy.findByRole("button", { name: /save/i }).click()
-    cy.findByText("Yes")
-    cy.findByRole("link", { name: /sessions/i }).should("exist")
   });
 }
 
