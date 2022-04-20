@@ -2,8 +2,8 @@
   "chromeWebSecurity": false,
   "baseUrl": "http://localhost:3101",
   "env": {
-    "email": "comaf53651@aikusy.com",
-    "password": "ox9SRIKr6as",
+    "email": "cypress.test@chums.org",
+    "password": "password",
     "appName": "CHUMS"
   },
   "projectId": "16cb4g",
