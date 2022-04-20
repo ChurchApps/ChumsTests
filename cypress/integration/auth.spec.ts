@@ -15,7 +15,7 @@ function login() {
         cy.findByRole("textbox", { name: /email/i }).type(email)
         cy.findByLabelText(/password/i).type(password)
         cy.findByRole("button", { name: /sign in/i }).click()
-        cy.findByRole("alert").should("have.text", "Invalid login. Please check your email or password.")
+        cy.findByRole("alert");
     })
 
     it("should work with valid credentials", () => {
@@ -24,7 +24,7 @@ function login() {
         cy.findByLabelText(/password/i).type(Cypress.env("password"))
         cy.findByRole("button", { name: /sign in/i }).click()
         cy.findByText(/select church/i)
-        cy.findByText(/cypress church/i).click()
+        cy.findByText(/claim 01/i).click() // TODO - don't hard code church name. Its better to fetch and then search that
         cy.url().should('include', "people")
         cy.getCookie("jwt").should("exist")
     })

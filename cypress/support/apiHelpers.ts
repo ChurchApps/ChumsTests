@@ -75,7 +75,9 @@ Cypress.Commands.add("makeAsyncApiCall", (method, route, apiName, payload) => {
     headers: {
       Authorization: "Bearer " + token,
       "Content-Type": "application/json",
+      cache: "no-cache"
     },
+    credentials: "omit"
   };
   if (payload !== undefined && payload !== null) requestOptions.body = payload;
   return fetch(domain + route, requestOptions).then(async (response) => {
