@@ -3,13 +3,19 @@ import { getPeople, PersonInterface } from "../support/index"
 
 describe("People", () => {
   before(() => {
+    cy.clearLocalStorageSnapshot();
     cy.login();
     doCleanUp();
   })
 
   beforeEach(() => {
+    cy.restoreLocalStorage();
     cy.login();
   });
+
+  afterEach(() => {
+    cy.saveLocalStorage();
+  })
 
   create();
   search();
