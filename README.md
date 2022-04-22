@@ -13,7 +13,9 @@ Automated test scripts for ChumsApp
 1. [APIs](https://youtu.be/M81I6gmKqdI)
 2. [ChumsApp](https://youtu.be/5zsEJEp6yMw)
 3. [Create Account](https://youtu.be/LjeSzT7OXw4)
+4. [Run Tests](https://youtu.be/yp53i_27mYA)
 
 ### Running Tests
 1. Launch GUI with `npm run cy:open`
 2. Click on a script to run a block of tests
+3. While trying to debug one particular test, it's helpful to comment out the calls to the other tests in the block so just the one script being debugged runs.
