@@ -49,3 +49,7 @@ Cypress.Commands.add("selectOption", (selector, value) => {
 Cypress.Commands.add("existThenClick", (selector) => {
   cy.get(selector).should('exist').click();
 })
+
+Cypress.Commands.add('getIframe', (iframe) => {
+  return cy.get(iframe).its('0.contentDocument.body').should('be.visible').then(cy.wrap);
+})
