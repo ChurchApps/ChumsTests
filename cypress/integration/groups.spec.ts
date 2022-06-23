@@ -11,7 +11,10 @@ context("Groups", () => {
   beforeEach(() => {
     cy.restoreLocalStorage();
     cy.login();
-    cy.visit("/groups");
+    cy.visit({
+      url: 'groups',
+      failOnStatusCode: false
+    });
   });
 
   afterEach(() => {
@@ -43,6 +46,7 @@ function createGroup() {
     const categoryName = faker.commerce.department();
     const groupName = faker.commerce.product();
 
+    cy.findByRole("img", { name: /church logo/i }).click();
     cy.findByRole("button", { name: /addgroup/i }).click();
     cy.findByRole("textbox", { name: /category name/i }).type(categoryName);
     cy.findByRole("textbox", { name: /group name/i }).type(groupName);
@@ -56,6 +60,7 @@ function deleteGroup() {
     const group = getGroups(1)[0];
 
     cy.createGroup(group);
+    cy.findByRole("img", { name: /church logo/i }).click();
     cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).click();
     cy.findByRole("heading", { name: new RegExp(group.name || "", "i") }).should("exist");
     cy.findByRole("button", { name: /editbutton/i }).click();
@@ -71,13 +76,14 @@ function addRemovePersonGroup() {
 
     cy.createGroup(group);
     cy.createPeople([person]);
+    cy.findByRole("img", { name: /church logo/i }).click();
     cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).click();
     cy.findByRole("heading", { name: new RegExp(group.name || "", "i") }).should("exist");
-    cy.findByRole("textbox", { name: /searchbox/i }).type(person.name.first || "");
+    cy.findByRole("textbox", { name: /Person/i }).type(person.name.first || "");
     cy.findByRole("button", { name: /search/i }).click();
     cy.findByRole("button", { name: /addperson/i }).click();
     cy.findByRole("link", { name: new RegExp(`${person.name.first} ${person.name.last}`, "i") }).should("exist");
-    cy.findByRole("link", { name: /remove/i }).click();
+    cy.findByRole("cell", { name: /Remove/i }).click();
     cy.findByRole("link", { name: new RegExp(`${person.name.first} ${person.name.last}`, "i") }).should("not.exist");
   });
 }
@@ -93,35 +99,38 @@ function addPersonToSession() {
     };
 
     createTestData(people, group, service);
-    cy.visit("/groups");
+    cy.visit({
+      url: 'groups',
+      failOnStatusCode: false
+    });
 
     // enable attendance tracking
+    cy.findByRole("img", { name: /church logo/i }).click();
     cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).click();
     cy.findByRole("heading", { name: new RegExp(group.name || "", "i") }).should("exist");
     cy.findByRole("button", { name: /editbutton/i }).click();
-    cy.findByRole("combobox", { name: /track attendance/i })
-      .select("Yes")
-      .should("have.value", "true");
+    cy.get('[name="trackAttendance"]').parent().click();
+    cy.findByRole("option", { name: "Yes" }).click();
+    cy.get('[name="trackAttendance"]').should("have.value", "true");
 
     // add service to the group
     const fullServiceName = `${service.campusName} - ${service.name} - ${service.time}`;
-    cy.findByRole("combobox", { name: /servicetime/i }).select(fullServiceName);
+    cy.get('[data-cy="choose-service-time"]').parent().click();
+    cy.findByRole("option", { name: fullServiceName }).click();
     cy.findByRole("button", { name: /add/i }).click();
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByText(fullServiceName);
 
     // create a new session
-    cy.findByRole("link", { name: /sessions/i }).click();
+    cy.findByRole("tab", { name: /Sessions/i }).click();
     cy.findByRole("alert").should("exist");
     cy.findByText(/available group members/i);
     cy.findByRole("button", { name: /new/i }).click();
-    cy.findByRole("combobox", { name: /service time/i }).select(fullServiceName);
     cy.findByRole("button", { name: /save/i }).click();
 
     // add user to session
-    cy.wait(2000);
-    cy.findByRole("link", { name: /add/i }).click();
-    cy.findByRole("link", { name: new RegExp(`${people[0].name.first} ${people[0].name.last}`) }).should("exist");
+    cy.get('[data-cy="add-service-time"]').parent().click();
+    cy.findByRole("cell", { name: fullServiceName }).click();
   });
 }
 

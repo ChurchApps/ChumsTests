@@ -8,7 +8,10 @@ import * as faker from "faker";
 describe("Forgot password", () => {
   beforeEach(() => {
     cy.clearLocalStorageSnapshot();
-    cy.visit("/login");
+    cy.visit({
+      url: 'login',
+      failOnStatusCode: false
+    });
     cy.findByRole("link", { name: /forgot password/i }).click();
   });
 
@@ -20,7 +23,7 @@ describe("Forgot password", () => {
 function shouldSendEmail() {
   it("should send forgot password mail", () => {
     cy.findByText(/reset password/i).should("exist");
-    cy.findByRole("textbox", { name: "email" }).type(Cypress.env("email"));
+    cy.findByRole("textbox", { name: "Email" }).type(Cypress.env("email"));
     cy.findByRole("button", { name: /reset/i }).click();
     cy.findByRole("alert").should("have.text", "Password reset email sent");
   });
@@ -30,7 +33,7 @@ function shouldThrowError() {
   it("should throw error for non-registered user", () => {
     const email = faker.internet.email();
 
-    cy.findByRole("textbox", { name: "email" }).type(email);
+    cy.findByRole("textbox", { name: "Email" }).type(email);
     cy.findByRole("button", { name: /reset/i }).click();
     cy.findByRole("alert").should("have.text", "We could not find an account with this email address");
   });
