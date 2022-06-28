@@ -1,4 +1,5 @@
 import * as faker from "faker";
+import { eq } from "../../node_modules/cypress/types/lodash/index";
 import { getForms, FormInterface, QuestionInterface } from "../support/index";
 
 describe("Forms", () => {
@@ -31,16 +32,20 @@ function form() {
   const newName = faker.company.companyName();
 
   it("should add / edit / delete form", () => {
-    cy.visit("/forms");
+    cy.visit({
+      url: 'forms',
+      failOnStatusCode: false
+    });
+    cy.findByRole("img", { name: /church logo/i }).click();
 
     // add
     cy.findByRole("button", { name: /addform/i }).click();
-    cy.findByRole("textbox", { name: /form name/i }).type(name);
+    cy.findByRole("textbox", { name: /form name/i }).click().type(name);
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByRole("link", { name: new RegExp(name, "i") }).should("exist");
 
     //edit
-    cy.findByRole("button", { name: /editform/i }).click();
+    cy.get('button[aria-label="editButton"]').eq(1).click();
     cy.findByRole("textbox", { name: /form name/i }).clear();
     cy.wait(2000);
     cy.findByRole("textbox", { name: /form name/i })
@@ -50,7 +55,7 @@ function form() {
     cy.findByRole("link", { name: new RegExp(newName, "i") }).should("exist");
 
     //delete
-    cy.findByRole("button", { name: /editform/i }).click();
+    cy.get('button[aria-label="editButton"]').eq(1).click();
     cy.wait(2000);
     cy.findByRole("button", { name: /delete/i }).click();
     cy.findByRole("link", { name: new RegExp(newName, "i") }).should("not.exist");
@@ -65,8 +70,12 @@ function question() {
   it("should add / edit / delete question", () => {
     // add
     cy.createForms(forms).then((forms: FormInterface[]) => {
-      cy.visit(`/forms/${forms[0].id}`);
+      cy.visit({
+        url: `/forms/${forms[0].id}`,
+        failOnStatusCode: false
+      });
     });
+    cy.findByRole("img", { name: /church logo/i }).click();
     cy.findByRole("button", { name: /addquestion/i }).click();
     cy.findByRole("textbox", { name: /title/i }).clear();
     cy.wait(2000);
@@ -77,7 +86,8 @@ function question() {
     // edit
     cy.findByRole("link", { name: new RegExp(title, "i") }).click();
     cy.wait(2000);
-    cy.findByRole("combobox", { name: /question type/i }).select("Email");
+    cy.get('#mui-component-select-fieldType').eq(0).parent().click()
+    cy.findByRole("option", { name: /Email/i }).click()
     cy.findByRole("textbox", { name: /title/i }).clear().type(newQuestionTitle);
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByRole("link", { name: new RegExp(newQuestionTitle, "i") }).should("exist");

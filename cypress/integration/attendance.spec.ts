@@ -10,7 +10,10 @@ context("Attendance", () => {
   beforeEach(() => {
     cy.restoreLocalStorage();
     cy.login();
-    cy.visit("/attendance");
+    cy.visit({
+      url: 'attendance',
+      failOnStatusCode: false
+    });
   });
 
   afterEach(() => {
@@ -34,8 +37,10 @@ function campus() {
     const AFTER_CAMPUS_NAME = faker.random.word();
 
     // add
-    cy.findByRole("link", { name: /addbutton/i }).click();
-    cy.findByRole("link", { name: /add campus/i }).click();
+    cy.findByRole("link", { name: /Cypress Church/i }).click();
+    cy.wait(1000)
+    cy.get('[data-cy="add-button"]').click();
+    cy.findByRole("menuitem", { name: /add campus/i }).click();
     cy.findByRole("textbox", { name: /campus name/i })
       .clear()
       .type(BEFORE_CAMPUS_NAME);
@@ -65,14 +70,18 @@ function service() {
 
     // add
     cy.makeApiCall("POST", "/campuses", "AttendanceApi", [{ name: CAMPUS_NAME }]);
+    cy.findByRole("link", { name: /Cypress Church/i }).click();
     cy.findByRole("link", { name: new RegExp(CAMPUS_NAME, "i") }).should("exist");
-    cy.findByRole("link", { name: /addbutton/i }).click();
-    cy.findByRole("link", { name: /addservice/i }).click();
+    cy.wait(1000)
+    cy.get('[data-cy="add-button"]').click();
+    cy.findByRole("menuitem", { name: /addService/i }).click();
     cy.findByRole("textbox", { name: /service name/i })
       .clear()
       .type(BEFORE_SERVICE_NAME);
     cy.wait(2000);
-    cy.findByRole("combobox", { name: /campus/i }).select(CAMPUS_NAME);
+
+    cy.get('#mui-component-select-campus').eq(0).parent().click()
+    cy.findByRole("option", { name: CAMPUS_NAME }).click()
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByRole("link", { name: new RegExp(BEFORE_SERVICE_NAME, "i") }).should("exist");
 
@@ -82,7 +91,8 @@ function service() {
       .clear()
       .type(AFTER_SERVICE_NAME);
     cy.wait(2000);
-    cy.findByRole("combobox", { name: /campus/i }).select(CAMPUS_NAME);
+    cy.get('#mui-component-select-campus').parent().click()
+    cy.findByRole("option", { name: CAMPUS_NAME }).click();
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByRole("link", { name: new RegExp(AFTER_SERVICE_NAME, "i") }).should("exist");
 
@@ -103,18 +113,19 @@ function serviceTime() {
     cy.makeApiCall("POST", "/campuses", "AttendanceApi", [{ name: CAMPUS_NAME }]).then((res) => {
       const campus = res[0];
       cy.makeApiCall("POST", "/services", "AttendanceApi", [{ campusId: campus.id, name: SERVICE_NAME }]);
-    });
+    });cy.findByRole("link", { name: /Cypress Church/i }).click();
     cy.findByRole("link", { name: new RegExp(CAMPUS_NAME, "i") }).should("exist");
     cy.findByRole("link", { name: new RegExp(SERVICE_NAME, "i") }).should("exist");
 
     // add
-    cy.findByRole("link", { name: /addbutton/i }).click();
-    cy.findByRole("link", { name: /add service time/i }).click();
+    cy.get('[data-cy="add-button"]').click();
+    cy.findByRole("menuitem", { name: /Add Service Time/i }).click();
     cy.findByRole("textbox", { name: /service time name/i })
       .clear()
       .type(BEFORE_SERVICE_TIME);
     cy.wait(2000);
-    cy.findByRole("combobox", { name: /service/i }).select(SERVICE_NAME);
+    cy.get('#mui-component-select-service').parent().click()
+    cy.findByRole("option", { name: SERVICE_NAME }).click();
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByRole("link", { name: new RegExp(BEFORE_SERVICE_TIME, "i") }).should("exist");
 
@@ -124,7 +135,8 @@ function serviceTime() {
       .clear()
       .type(AFTER_SERVICE_TIME);
     cy.wait(2000);
-    cy.findByRole("combobox", { name: /service/i }).select(SERVICE_NAME);
+    cy.get('#mui-component-select-service').parent().click()
+    cy.findByRole("option", { name: SERVICE_NAME }).click();
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByRole("link", { name: new RegExp(AFTER_SERVICE_TIME, "i") }).should("exist");
 
