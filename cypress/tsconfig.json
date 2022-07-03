@@ -3,7 +3,7 @@
     "strict": true,
     "target": "es2017",
     "lib": ["es5", "dom", "ES2017.Object"],
-    "types": ["cypress", "@testing-library/cypress", "cypress-file-upload", "cypress-localstorage-commands"]
+    "types": ["cypress", "@testing-library/cypress", "cypress-file-upload", "cypress-localstorage-commands", "cypress-xpath"]
   },
   "include": ["**/*.ts"]
 }

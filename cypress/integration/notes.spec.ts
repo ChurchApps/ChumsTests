@@ -27,19 +27,23 @@ function note() {
 
   it("should add / edit / delete a note", () => {
     cy.createPeople(people).then((people: PersonInterface[]) => {
-      cy.visit(`/people/${people[0].id}`);
+      cy.visit({
+        url: `/people/${people[0].id}`,
+        failOnStatusCode: false
+      });
     });
 
     // add
+    cy.findByRole("img", { name: /church logo/i }).click();
     cy.findByRole("button", { name: /addnote/i }).click();
-    cy.findByRole("textbox", { name: /add a note/i }).type(noteText);
+    cy.findByRole("textbox", { name: /Some note.../i }).type(noteText);
     cy.findByRole("button", { name: /save/i }).click();
     cy.findByText(new RegExp(noteText, "i"));
 
     // edit
     cy.findByRole("button", { name: /editnote/i }).click();
-    cy.findByRole("textbox", { name: /edit note/i }).should("have.value", noteText);
-    cy.findByRole("textbox", { name: /edit note/i })
+    cy.findByRole("textbox", { name: /Some note.../i }).should("have.value", noteText);
+    cy.findByRole("textbox", { name: /Some note.../i })
       .clear()
       .type(newNoteText);
     cy.findByRole("button", { name: /save/i }).click();
