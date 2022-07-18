@@ -23,7 +23,7 @@ describe("Household", () => {
 });
 
 function addRemove() {
-  it.skip("should be able to add and remove a member from household", () => {
+  it("should be able to add and remove a member from household", () => {
     const people = getPeople(2, { withoutAddress: true });
     cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit({
@@ -47,7 +47,7 @@ function addRemove() {
 }
 
 function changeRole() {
-  it.skip("should be able to change role", () => {
+  it("should be able to change role", () => {
     const people = getPeople(1);
     cy.createPeople(people).then((people: PersonInterface[]) => {
       cy.visit({
@@ -106,8 +106,8 @@ function addPersonToHousehold(people: PersonInterface[]) {
   cy.findByText(new RegExp(`${people[0].name.last} household`, "i")).should("exist");
   cy.findByRole("link", { name: new RegExp(`${people[0].name.first} ${people[0].name.last}`, "i") });
   cy.get('button[aria-label="editButton"]').eq(1).click();
-  cy.findByRole("button", { name: /addmember/i }).click();
-  cy.findByRole("textbox", { name: /searchbox/i }).type(people[1].name.first || "");
-  cy.findByRole("button", { name: /search/i }).click();
+  cy.get("#householdBox button").eq(1).click();
+  cy.get("[name='personAddText']").type(people[1].name.first || "");
+  cy.get("#searchButton").click();
   cy.findByRole("button", { name: /addperson/i }).click();
 }
