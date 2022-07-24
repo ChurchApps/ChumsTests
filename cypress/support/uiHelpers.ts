@@ -56,7 +56,7 @@ declare namespace Cypress {
 
 Cypress.Commands.add("loadPerson", (name) => {
   cy.get("#searchText").type(name);
-  cy.get("#searchButton").click();
+  cy.get("[aria-label=searchBox] button").click();
   cy.get("body").should("contain", name);
   cy.get("a:contains('" + name + "')").click();
   cy.get("h2").should("contain", name);

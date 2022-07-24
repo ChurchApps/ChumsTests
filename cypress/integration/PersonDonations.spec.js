@@ -1,17 +1,26 @@
+import * as faker from "faker"
+import { getPeople, PersonInterface } from "../support/index"
+
 context("Create person donation", () => {
   before(() => {
     cy.login();
     cleanUpDonations();
     createPaymentGateway();
     createFunds([{ name: "Van Fund"}, { name: "General Fund" }]);
-    cy.createPeople([{ first: "Cypress", last: "Tester" }]);
   })
   
   beforeEach(() => {
     cy.login();
-    cy.visit("people/");
-    cy.loadPerson('Cypress Tester');
-    cy.existThenClick("[aria-label=donations-tab]")
+    const people = getPeople(1)
+    const { name: { first, last } } = people[0]
+    cy.createPeople(people)
+    cy.visit({
+      url: `/people`,
+      failOnStatusCode: false
+    })
+    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.loadPerson(`${first} ${last}`);
+    cy.findByRole("tab", { name: /Donations/i }).click();
   })
   
   createPaymentMethods();
@@ -26,7 +35,7 @@ function createPaymentMethods() {
   it("Create Stripe payment methods", () => {
   
     // Card
-    cy.findByRole("link", { name: /add-button/i }).click()
+    cy.findByRole("button", { name: /editButton/i }).click()
     cy.findByRole("link", { name: /add-card/i }).click()
     cy.wait(1000);
     cy.getIframe('.StripeElement > .__PrivateStripeElement > iframe').click().type("4242 4242 4242 4242 1230 123 12345");
@@ -141,7 +150,10 @@ function eventLog() {
         cy.makeApiCall("POST", "/eventLog", "GivingApi", events);
       }
     });
-    cy.visit("donations/");
+    cy.visit({
+      url: `/donations`,
+      failOnStatusCode: false
+    })
     cy.get("[data-cy=eventLogs] [aria-label=card]").eq(0).click();
     cy.findByRole("button", { name: /resolve-button/i }).click();
   });
