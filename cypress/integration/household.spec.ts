@@ -31,7 +31,7 @@ function addRemove() {
         failOnStatusCode: false
       });
     });
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByText(new RegExp(`${people[0].name.last} household`, "i"));
     cy.findByRole("link", { name: new RegExp(`${people[0].name.first} ${people[0].name.last}`, "i") });
     cy.get('button[aria-label="editButton"]').eq(0).click();
@@ -55,7 +55,7 @@ function changeRole() {
         failOnStatusCode: false
       });
     });
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByText(new RegExp(`${people[0].name.last} household`, "i")).should("exist");
     cy.findByRole("link", { name: new RegExp(`${people[0].name.first} ${people[0].name.last}`, "i") });
     cy.get('button[aria-label="editButton"]').eq(1).click();
@@ -102,7 +102,7 @@ function addPersonToHousehold(people: PersonInterface[]) {
       failOnStatusCode: false
     });
   });
-  cy.findByRole("img", { name: /church logo/i }).click();
+  cy.findByRole("link", { name: Cypress.env("church") }).click(); 
   cy.findByText(new RegExp(`${people[0].name.last} household`, "i")).should("exist");
   cy.findByRole("link", { name: new RegExp(`${people[0].name.first} ${people[0].name.last}`, "i") });
   cy.get('button[aria-label="editButton"]').eq(1).click();

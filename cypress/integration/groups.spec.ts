@@ -46,7 +46,7 @@ function createGroup() {
     const categoryName = faker.commerce.department();
     const groupName = faker.commerce.product();
 
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByRole("button", { name: /addgroup/i }).click();
     cy.findByRole("textbox", { name: /category name/i }).type(categoryName);
     cy.findByRole("textbox", { name: /group name/i }).type(groupName);
@@ -60,7 +60,7 @@ function deleteGroup() {
     const group = getGroups(1)[0];
 
     cy.createGroup(group);
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).click();
     cy.findByRole("heading", { name: new RegExp(group.name || "", "i") }).should("exist");
     cy.findByRole("button", { name: /editbutton/i }).click();
@@ -76,7 +76,7 @@ function addRemovePersonGroup() {
 
     cy.createGroup(group);
     cy.createPeople([person]);
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).click();
     cy.findByRole("heading", { name: new RegExp(group.name || "", "i") }).should("exist");
     cy.findByRole("textbox", { name: /Person/i }).type(person.name.first || "");
@@ -105,7 +105,7 @@ function addPersonToSession() {
     });
 
     // enable attendance tracking
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByRole("link", { name: new RegExp(group.name || "", "i") }).click();
     cy.findByRole("heading", { name: new RegExp(group.name || "", "i") }).should("exist");
     cy.findByRole("button", { name: /editbutton/i }).click();

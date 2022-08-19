@@ -33,8 +33,8 @@ function login() {
     cy.findByLabelText(/password/i).type(Cypress.env("password"));
     cy.findByRole("button", { name: /sign in/i }).click();
     cy.findByText(/select church/i);
-    cy.findByRole("img", { name: /church logo/i }).click(); // TODO - don't hard code church name. Its better to fetch and then search that
-    cy.url().should("include", "people");
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
+    //cy.url().should("include", "people"); -- page redirects to dashboard. for confirmation
     cy.getCookie("jwt").should("exist");
   });
 
@@ -54,7 +54,7 @@ function logout() {
       url: 'people',
       failOnStatusCode: false
     });
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByRole("button", { name: /Cypress Chums/i }).click();
     cy.findByRole("link", { name: /logout/i }).click();
     cy.url().should("include", "login");

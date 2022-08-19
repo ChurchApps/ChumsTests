@@ -25,7 +25,7 @@ function shouldSendEmail() {
     cy.findByText(/reset password/i).should("exist");
     cy.findByRole("textbox", { name: "Email" }).type(Cypress.env("email"));
     cy.findByRole("button", { name: /reset/i }).click();
-    cy.findByRole("alert").should("have.text", "Password reset email sent");
+    cy.findByText(/Password reset email sent/i);
   });
 }
 
@@ -35,6 +35,6 @@ function shouldThrowError() {
 
     cy.findByRole("textbox", { name: "Email" }).type(email);
     cy.findByRole("button", { name: /reset/i }).click();
-    cy.findByRole("alert").should("have.text", "We could not find an account with this email address");
+    cy.findByText(/We could not find an account with this email address/i);
   });
 }

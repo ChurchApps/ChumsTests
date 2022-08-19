@@ -4,7 +4,8 @@
   "env": {
     "email": "cypress.test@chums.org",
     "password": "password",
-    "appName": "CHUMS"
+    "appName": "CHUMS",
+    "church": "Cypress Church"
   },
   "projectId": "16cb4g",
   "defaultCommandTimeout": 15000,

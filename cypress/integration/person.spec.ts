@@ -40,7 +40,7 @@ function create() {
       url: `/people`,
       failOnStatusCode: false
     })
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.get("[name='first']").type(firstName)
     cy.get("[name='last']").type(lastName)
     cy.get("#peopleBox button").eq(1).click()
@@ -59,7 +59,7 @@ function search() {
   it("searching people should work", () => {
     cy.createPeople(people)
     cy.visit("/")
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.get("[name='searchText']").type(`${first} ${last}`)
     cy.get("#peopleBox button").click()
     cy.findByRole("link", { name: new RegExp(`${first} ${last}`, "i") }).should("exist")
@@ -79,8 +79,10 @@ function cancelAndRemove() {
         failOnStatusCode: false
       })
     });
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
+    cy.wait(1500)
     cy.get("button[aria-label='editButton']").eq(0).click()
+    cy.wait(1500)
     cy.get("#delete").click()
     cy.wait(1500)
     cy.get("h1")
@@ -126,7 +128,8 @@ function edit() {
         failOnStatusCode: false
       })
     })
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
+    cy.wait(1500)
     cy.get("button[aria-label='editButton']").eq(0).click()
 
     // fill all textbox values
@@ -149,14 +152,15 @@ function edit() {
     }
 
     cy.findByRole("button", { name: /save/i }).click()
+    cy.wait(1500)
 
     // verify after save
-    cy.findByText(new RegExp(`${first} "${textbox.nickname}" ${last}`))
-    cy.findByText(/female/i)
-    cy.findByText(new RegExp(textbox.email), "i")
-    cy.findByText(new RegExp(`${textbox.city}, CA ${textbox.zip}`))
-    cy.findByRole('cell', { name: textbox.home })
-    cy.findByRole('cell', { name: textbox.work })
+    cy.get('[data-cy="content"]').eq(0).contains(`${first} "${textbox.nickname}" ${last}`)
+    cy.get('[data-cy="content"]').eq(0).contains('Female')
+    cy.get('[data-cy="content"]').eq(0).contains(textbox.email)
+    cy.get('[data-cy="content"]').eq(0).contains(`${textbox.city}, CA ${textbox.zip}`)
+    cy.get('[data-cy="content"]').eq(0).contains(textbox.home)
+    cy.get('[data-cy="content"]').eq(0).contains(textbox.work)
   });
 }
 
@@ -172,7 +176,8 @@ function image() {
       })
     })
     // add new image
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
+    cy.wait(1500)
     cy.get("button[aria-label='editButton']").eq(0).click()
     cy.findByRole("link", { name: /avatar/i }).click()
     cy.findByText(/crop/i)
@@ -186,7 +191,8 @@ function image() {
     // delete
     cy.get("button[aria-label='editButton']").eq(0).click()
     cy.findByRole("link", { name: /avatar/i }).click()
-    cy.get("#delete").eq(1).click()
+    cy.wait(2000)
+    cy.get("[aria-label='deletePhoto']").click()
     cy.findByRole("button", { name: /save/i }).click()
     cy.findByRole("img", { name: /personimage/i }).should("have.attr", "src").should("include", "sample-profile.png")
   })
@@ -204,7 +210,8 @@ function mergePerson() {
         failOnStatusCode: false
       })
     })
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
+    cy.wait(1500)
     cy.get("button[aria-label='editButton']").eq(0).click()
     cy.findByRole("button", { name: /merge/i }).click()
     cy.get("[name='personAddText']").type(people[1].name.first || "")
@@ -214,12 +221,10 @@ function mergePerson() {
     })
     cy.findByText(new RegExp(`would you like to merge ${person1.name.first} ${person1.name.last} with ${person2.name.first} ${person2.name.last}?`, "i")).should("exist")
     cy.findByRole("button", { name: /confirm/i }).click()
-    cy.findByText(/Please select atleast 1 value for each field/i)
-    cy.get(".col-sm-10 > :nth-child(2) > .form-check-input").check();
-    cy.findByRole("button", { name: /confirm/i }).click()
-    cy.findByRole("[name='searchText']").type(`${person1.name.first} ${person1.name.last}`)
+    cy.wait(3000)
+    cy.get("[name='searchText']").type(`${person1.name.first} ${person1.name.last}`)
     cy.findByRole("button", { name: /search/i }).click()
-    cy.findByRole("link", { name: new RegExp(`${person1.name.first} ${person1.name.last}`, "i") }).should("not.exist")
+    cy.findByRole("link", { name: new RegExp(`${person1.name.first} ${person1.name.last}`, "i") }).should("exist")
   });
 }
 
@@ -250,7 +255,7 @@ function changeAddressCurrentPerson() {
     createPeopleWithAddress(people, address1)
     cy.findByRole("button", { name: /no/i }).click()
     cy.findByRole("link", { name: new RegExp(`${people[1].name.first} ${people[1].name.last}`) }).click()
-    cy.findByText(new RegExp(address1, "i")).should("not.exist")
+    cy.get('[data-cy="content"]').eq(0).should('not.contain', address1)
   })
 }
 
@@ -262,15 +267,15 @@ function changeAddressFullHousehold() {
     createPeopleWithAddress(people, address1)
     cy.findByRole("button", { name: /yes/i }).click()
     cy.findByRole("link", { name: new RegExp(`${people[1].name.first} ${people[1].name.last}`) }).click()
-    cy.findByText(new RegExp(address1, "i")).should("exist")
+    cy.get('[data-cy="content"]').eq(0).contains(address1)
   })
 }
 
 function createPeopleWithAddress(people: PersonInterface[], address1: string) {
   createTestDataWithMembers(people);
-  cy.findByRole("img", { name: /church logo/i }).click();
+  cy.findByRole("link", { name: Cypress.env("church") }).click(); 
+  cy.wait(1500)
   cy.get("button[aria-label='editButton']").eq(0).click()
   cy.findByRole("textbox", { name: /line 1/i }).type(address1)
   cy.findByRole("button", { name: /save/i }).click()
-  cy.findByText(/update address/i).should("exist")
 }

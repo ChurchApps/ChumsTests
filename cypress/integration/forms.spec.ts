@@ -36,7 +36,7 @@ function form() {
       url: 'forms',
       failOnStatusCode: false
     });
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
 
     // add
     cy.findByRole("button", { name: /addform/i }).click();
@@ -75,7 +75,7 @@ function question() {
         failOnStatusCode: false
       });
     });
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByRole("button", { name: /addquestion/i }).click();
     cy.findByRole("textbox", { name: /title/i }).clear();
     cy.wait(2000);

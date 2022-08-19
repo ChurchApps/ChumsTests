@@ -34,7 +34,7 @@ function note() {
     });
 
     // add
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.findByRole("button", { name: /addnote/i }).click();
     cy.findByRole("textbox", { name: /Some note.../i }).type(noteText);
     cy.findByRole("button", { name: /save/i }).click();

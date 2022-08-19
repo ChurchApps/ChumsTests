@@ -45,7 +45,7 @@ function addEditFundsList() {
         const NEW_FUND_NAME = faker.random.word();
 
         // create
-        cy.findByRole("img", { name: /church logo/i }).click();
+        cy.findByRole("link", { name: Cypress.env("church") }).click(); 
         cy.get('#fundsBox button').click();
         cy.findByRole("textbox", { name: /Name/i })
             .type(FUND_NAME);
@@ -65,7 +65,7 @@ function addEditFundsList() {
             url: 'donations',
             failOnStatusCode: false
         });
-        cy.findByRole("img", { name: /church logo/i }).click();
+        cy.findByRole("link", { name: Cypress.env("church") }).click(); 
         cy.notContainAll("[data-cy=funds-box]", [NEW_FUND_NAME]);
     })
 }
@@ -76,7 +76,7 @@ function addEditBatchList() {
         const newBatch = { name: "Evening", date: "2021-03-31" };
 
         // create
-        cy.findByRole("img", { name: /church logo/i }).click();
+        cy.findByRole("link", { name: Cypress.env("church") }).click(); 
         cy.existThenClick("#batchesBox button");
         cy.enterText("[name='name']", batch.name);
         cy.enterText("[name='date']", batch.date);
@@ -98,7 +98,7 @@ function addEditBatchList() {
             url: 'donations',
             failOnStatusCode: false
         });
-        cy.findByRole("img", { name: /church logo/i }).click();
+        cy.findByRole("link", { name: Cypress.env("church") }).click(); 
         cy.notContainAll("#batchesBox", [newBatch.name, batch.name]);        
     })
 }
@@ -113,7 +113,7 @@ function makeEditDonation() {
 
         createFunds(funds);
         createBatches(batches).then(res => {
-            cy.findByRole("img", { name: /church logo/i }).click();
+            cy.findByRole("link", { name: Cypress.env("church") }).click(); 
             cy.containsClick(res[0].id);
         });
         cy.wait(1000);
@@ -155,7 +155,7 @@ function donationFromPerson() {
                 url: 'donations',
                 failOnStatusCode: false
             });
-            cy.findByRole("img", { name: /church logo/i }).click();
+            cy.findByRole("link", { name: Cypress.env("church") }).click(); 
             cy.containsClick(res[0].id);
         });
         cy.wait(1000);
@@ -189,7 +189,7 @@ function checkFundInfo() {
             failOnStatusCode: false
         });
 
-        cy.findByRole("img", { name: /church logo/i }).click();
+        cy.findByRole("link", { name: Cypress.env("church") }).click(); 
         cy.containsClick(funds[0].name);
         cy.get("[data-cy=start-date]").type(filter.start);
         cy.get("[data-cy=end-date]").type(filter.end);
@@ -235,7 +235,7 @@ function verifyChart() {
             failOnStatusCode: false
         });
 
-        cy.findByRole("img", { name: /church logo/i }).click();
+        cy.findByRole("link", { name: Cypress.env("church") }).click(); 
         cy.get("[name='startDate']").type(filter.start);
         cy.get("[name='endDate']").type(filter.end);
         cy.get("div button.MuiButton-root").eq(1).click()
@@ -253,7 +253,7 @@ function errorCaseMakeDonation() {
                 url: 'donations',
                 failOnStatusCode: false
             });
-            cy.findByRole("img", { name: /church logo/i }).click();
+            cy.findByRole("link", { name: Cypress.env("church") }).click(); 
             cy.containsClick(res[0].id);
         });
         cy.wait(1000);

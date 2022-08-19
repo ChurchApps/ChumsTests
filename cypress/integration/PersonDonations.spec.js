@@ -18,7 +18,7 @@ context("Create person donation", () => {
       url: `/people`,
       failOnStatusCode: false
     })
-    cy.findByRole("img", { name: /church logo/i }).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
     cy.loadPerson(`${first} ${last}`);
     cy.findByRole("tab", { name: /Donations/i }).click();
   })
