@@ -2,24 +2,27 @@ import * as faker from "faker"
 import { getPeople, PersonInterface } from "../support/index"
 
 context("Create person donation", () => {
+
+  var loadPerson
   before(() => {
     cy.login();
     cleanUpDonations();
     createPaymentGateway();
     createFunds([{ name: "Van Fund"}, { name: "General Fund" }]);
+    const people = getPeople(1)
+    const { name: { first, last } } = people[0]
+    cy.createPeople(people)
+    loadPerson = `${first} ${last}`
   })
   
   beforeEach(() => {
     cy.login();
-    const people = getPeople(1)
-    const { name: { first, last } } = people[0]
-    cy.createPeople(people)
     cy.visit({
       url: `/people`,
       failOnStatusCode: false
     })
     cy.findByRole("link", { name: Cypress.env("church") }).click(); 
-    cy.loadPerson(`${first} ${last}`);
+    cy.loadPerson(`${loadPerson}`);
     cy.findByRole("tab", { name: /Donations/i }).click();
   })
   
@@ -35,25 +38,25 @@ function createPaymentMethods() {
   it("Create Stripe payment methods", () => {
   
     // Card
-    cy.findByRole("button", { name: /editButton/i }).click()
-    cy.findByRole("link", { name: /add-card/i }).click()
+    cy.findByRole("button", { name: /add-button/i }).click()
+    cy.findByRole("menuitem", { name: /add-card/i }).click()
     cy.wait(1000);
     cy.getIframe('.StripeElement > .__PrivateStripeElement > iframe').click().type("4242 4242 4242 4242 1230 123 12345");
     cy.findByRole("button", { name: /save-button/i }).click()
     cy.findByText(/visa \*\*\*\*4242/i).should("exist");
   
     // Bank
-    cy.findByRole("link", { name: /add-button/i }).click()
-    cy.findByRole("link", { name: /add-bank/i }).click()
-    cy.findByRole("textbox", { name: "account-holder-name" }).type("Tester Cypress");
-    cy.findByRole("spinbutton", { name: "routing-number" }).type("110000000");
-    cy.findByRole("spinbutton", {name: "account-number"}).type("000123456789");
+    cy.findByRole("button", { name: /add-button/i }).click()
+    cy.findByRole("menuitem", { name: /add-bank/i }).click()
+    cy.findByRole("textbox", { name: "Account Holder Name" }).type("Tester Cypress");
+    cy.findByRole("spinbutton", { name: "Routing Number" }).type("110000000");
+    cy.findByRole("spinbutton", {name: "Account Number"}).type("000123456789");
     cy.findByRole("button", { name: /save-button/i }).click()
   
     //Verify Bank Account
     cy.findByRole("link", { name: /verify-account/i }).click()
-    cy.findByRole("textbox", { name: "amount1" }).type("32");
-    cy.findByRole("textbox", { name: "amount2" }).type("45");
+    cy.findByRole("textbox", { name: "First Deposit" }).type("32");
+    cy.findByRole("textbox", { name: "Second Deposit" }).type("45");
     cy.findByRole("button", { name: /save-button/i }).click()
     cy.findByRole("link", { name: /verify-account/i }).should("not.exist");
   })
@@ -64,15 +67,16 @@ function editPaymentMethods() {
 
     // Edit card
     cy.findAllByRole("link", { name: "edit-button"}).then(links => links[0].click());
-    cy.findByRole("textbox", { name: "card-exp-month" }).type("02");
-    cy.findByRole("textbox", { name: "card-exp-year" }).type("32");
+    cy.findByRole("textbox", { name: "Card Expiration Month:" }).type("02");
+    cy.findByRole("textbox", { name: "Card Expiration Year:" }).type("32");
     cy.findByRole("button", { name: /save-button/i }).click()
   
     // // Edit bank
     cy.findAllByRole("link", { name: "edit-button"}).then(links => links[1].click());
-    cy.findByRole("textbox", { name: "account-holder-name" }).clear();
-    cy.findByRole("textbox", { name: "account-holder-name" }).type("Cypress Tester");
-    cy.selectOption("[aria-label=account-holder-type]", "company");
+    cy.findByRole("textbox", { name: "Account Holder Name" }).clear();
+    cy.findByRole("textbox", { name: "Account Holder Name" }).type("Cypress Tester");
+    cy.get('[aria-label=account-holder-type]').eq(0).parent().click()
+    cy.findByRole("option", { name: /Company/i }).click()
     cy.findByRole("button", { name: /save-button/i }).click()
   });
 }
@@ -82,41 +86,31 @@ function donateFromPaymentMethods() {
   
     // Single donation
     cy.findByRole("button", { name: /single-donation/i }).click();
-    cy.get('[aria-label=fund] option').eq(1).invoke('val').then(val => {
-      cy.get("[aria-label=fund]").select(val);
-    });
-    cy.findByRole("spinbutton", { name: "amount" }).type("100");
+    cy.findByRole("spinbutton", { name: "Amount" }).type("100");
     cy.findByRole("link", { name: /add-fund-donation/i }).click();
-    cy.get("[aria-label=amount]").eq(1).type("50");
+    cy.get("[name='amount']").eq(1).type("50");
 
-    cy.findByRole("textbox", { name: "note" }).type("Test single donation note.");
+    cy.findByRole("textbox", { name: "Notes" }).type("Test single donation note.");
     cy.findByRole("button", { name: /save-button/i }).click();
     cy.findByRole("button", { name: /donate-button/i }).click();
   
     // Recurring donation
     cy.findByRole("button", { name: /recurring-donation/i }).click();
-    cy.get('[aria-label=fund] option').eq(1).invoke('val').then(val => {
-      cy.get("[aria-label=fund]").select(val);
-    });
-    cy.enterText("[aria-label=date]", "2030-01-01");
-    cy.get("[aria-label=interval-type]").select("week");
-    cy.get('[aria-label=fund] option').eq(1).invoke('val').then(val => {
-      cy.get("[aria-label=fund]").select(val);
-    });
-    cy.get("[aria-label=amount]").eq(0).type("25");
+    cy.enterText("[name='date']", "2030-01-01");
+    cy.get('#mui-component-select-interval-type').eq(0).parent().click()
+    cy.findByRole("option", { name: /Week/i }).click()
+    cy.get("[name='amount']").eq(0).type("50");
 
     cy.findByRole("link", { name: /add-fund-donation/i }).click();
-    cy.get("[aria-label=amount]").eq(1).type("50");
-    cy.findByRole("textbox", { name: "note" }).type("Test recurring donation note.");
+    cy.get("[name='amount']").eq(1).type("50");
+    cy.findByRole("textbox", { name: "Notes" }).type("Test recurring donation note.");
     cy.findByRole("button", { name: /save-button/i }).click();
     cy.findByRole("button", { name: /donate-button/i }).click();
 
     // Edit recurring donation
     cy.existThenClick("[data-cy=recurring-donations] [aria-label=edit-button]");
-    cy.get("[aria-label=method] option").eq(0).invoke('val').then(val => {
-      cy.get("[aria-label=method]").select(val);
-    });
-    cy.get("[aria-label=interval-type]").select("month");
+    cy.get('#mui-component-select-interval-type').eq(0).parent().click()
+    cy.findByRole("option", { name: /Month/i }).click()
     cy.findByRole("button", { name: /save-button/i }).click();
   
     // Delete recurring donation
@@ -154,7 +148,8 @@ function eventLog() {
       url: `/donations`,
       failOnStatusCode: false
     })
-    cy.get("[data-cy=eventLogs] [aria-label=card]").eq(0).click();
+    cy.findByRole("link", { name: Cypress.env("church") }).click(); 
+    cy.get(" [data-cy=eventLogs] [data-cy=content]").click();
     cy.findByRole("button", { name: /resolve-button/i }).click();
   });
 }
